@@ -3,14 +3,15 @@
 
     <string name="app_name">My Deezer radio</string>
     <string name="action_settings">Settings</string>
-    
     <string name="main_editText_email">Adresse mail</string>
     <string name="main_editText_password">Mot de passe</string>
     <string name="main_button_connect">Connexion</string>
     <string name="main_textView_rememberMe">Se souvenir de moi</string>
-    <string name="title_activity_song_selection">Song_selection</string>
-
     <string name="title_activity_song_input">SongInput</string>
     <string name="songInput_editText_song">Chanson de départ ?</string>
+    <string name="songInput_button_search">Recherche</string>
+    <string name="songInput_button_return">Retour</string>
+    <string name="title_activity_song_selection">SongSelection</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

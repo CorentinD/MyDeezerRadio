@@ -8,6 +8,8 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -23,20 +25,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.Song_selection"
-            android:label="@string/title_activity_song_selection"
-            android:parentActivityName="MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
-        </activity>
-        <activity
             android:name="com.example.mydeezerradio.SongInput"
             android:label="@string/title_activity_song_input"
             android:parentActivityName="com.example.mydeezerradio.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mydeezerradio.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.example.mydeezerradio.SongSelection"
+            android:label="@string/title_activity_song_selection"
+            android:parentActivityName="com.example.mydeezerradio.SongInput" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mydeezerradio.SongInput" />
         </activity>
     </application>
 

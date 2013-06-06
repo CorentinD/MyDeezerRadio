@@ -12,9 +12,27 @@
         android:id="@+id/songInput_editText_song"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:ems="13"
         android:hint="@string/songInput_editText_song"
-        android:inputType="text"
-        android:minEms="10" />
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/songInput_button_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/songInput_editText_song"
+        android:layout_centerHorizontal="true"
+        android:onClick="songInput_button_search"
+        android:text="@string/songInput_button_search" />
+
+    <Button
+        android:id="@+id/songInput_button_return"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="songInput_onClick_return"
+        android:text="@string/songInput_button_return" />
 
 </RelativeLayout>

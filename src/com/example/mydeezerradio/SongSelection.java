@@ -1,28 +1,22 @@
 package com.example.mydeezerradio;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.support.v4.app.NavUtils;
+import android.annotation.TargetApi;
+import android.os.Build;
 
-public class SongInput extends Activity {
+public class SongSelection extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_song_input);
+		setContentView(R.layout.activity_song_selection);
 		// Show the Up button in the action bar.
 		setupActionBar();
 	}
-
-	public void songInput_onClick_return(View view) {
-		finish();
-	}
-	
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -37,7 +31,7 @@ public class SongInput extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.song_input, menu);
+		getMenuInflater().inflate(R.menu.song_selection, menu);
 		return true;
 	}
 
