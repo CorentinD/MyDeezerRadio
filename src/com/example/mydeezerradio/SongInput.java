@@ -2,12 +2,14 @@ package com.example.mydeezerradio;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 public class SongInput extends Activity {
 
@@ -22,7 +24,18 @@ public class SongInput extends Activity {
 	public void songInput_onClick_return(View view) {
 		finish();
 	}
-	
+
+	public void songInput_onClick_search(View view) {
+
+		String song = String.valueOf(((TextView) view).getText());
+
+		if (song.length() > 0) {
+			Intent intent = new Intent(this, SongSelection.class);
+			intent.putExtra("songInput_search_song", song);
+
+			startActivity(intent);
+		}
+	}
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.

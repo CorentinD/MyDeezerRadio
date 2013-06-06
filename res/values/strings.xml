@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="hello_world">Hello world!</string>
     <string name="app_name">My Deezer radio</string>
     <string name="action_settings">Settings</string>
     <string name="main_editText_email">Adresse mail</string>
@@ -12,6 +13,6 @@
     <string name="songInput_button_search">Recherche</string>
     <string name="songInput_button_return">Retour</string>
     <string name="title_activity_song_selection">SongSelection</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="songSelection_button_return">Retour</string>
 
 </resources>

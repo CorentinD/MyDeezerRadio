@@ -1,14 +1,21 @@
 package com.example.mydeezerradio;
 
-import android.os.Bundle;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
-import android.os.Build;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class SongSelection extends Activity {
+
+	ListView songSelection_listView_songList;
+	ArrayAdapter<String> songSelection_adapter_songListAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +23,27 @@ public class SongSelection extends Activity {
 		setContentView(R.layout.activity_song_selection);
 		// Show the Up button in the action bar.
 		setupActionBar();
+
+		songSelection_listView_songList = (ListView) findViewById(R.id.songSelection_listView_songList);
+
+		songSelection_adapter_songListAdapter = (ArrayAdapter<String>) songSelection_listView_songList
+				.getAdapter();
+		Intent parent_intent = getIntent();
+
+		String temp_searched_song = parent_intent
+				.getStringExtra("songInput_search_song");
+		
+		
+
+		songSelection_adapter_songListAdapter.add(temp_searched_song);
+
+		songSelection_listView_songList
+				.setAdapter(songSelection_adapter_songListAdapter);
+
+	}
+
+	public void songSelection_onClick_return(View view) {
+		finish();
 	}
 
 	/**

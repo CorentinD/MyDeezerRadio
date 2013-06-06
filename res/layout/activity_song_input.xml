@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/songInput_editText_song"
         android:layout_centerHorizontal="true"
-        android:onClick="songInput_button_search"
+        android:onClick="songInput_onClick_search"
         android:text="@string/songInput_button_search" />
 
     <Button
