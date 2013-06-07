@@ -16,8 +16,7 @@ public class SongListeningActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
-		// Show the Up button in the action bar.
-		setupActionBar();
+
 	}
 
 	public void songListening_onClick_return(View view) {

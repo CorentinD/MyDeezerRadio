@@ -2,12 +2,10 @@ package com.example.mydeezerradio;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +18,7 @@ public class SongSelectionActivity extends Activity {
 
 	ListView songSelection_listView_songList;
 	ArrayAdapter<String> songSelection_adapter_songListAdapter;
-	public static final String EXTRA_SONGSELECTION_SELECTION="songSelection_clicked_song";
+	public static final String EXTRA_SONGSELECTION_SELECTION = "songSelection_clicked_song";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +63,16 @@ public class SongSelectionActivity extends Activity {
 					@Override
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
-						
-						String temp_clicked_song = String.valueOf(((TextView) v).getText());
-						
-						Intent intent = new Intent(getApplicationContext(), SongListeningActivity.class);
-						intent.putExtra(EXTRA_SONGSELECTION_SELECTION,temp_clicked_song);
+
+						String temp_clicked_song = String
+								.valueOf(((TextView) v).getText());
+
+						Intent intent = new Intent(getApplicationContext(),
+								SongListeningActivity.class);
+						intent.putExtra(EXTRA_SONGSELECTION_SELECTION,
+								temp_clicked_song);
 						startActivity(intent);
-						
+
 					}
 				});
 
