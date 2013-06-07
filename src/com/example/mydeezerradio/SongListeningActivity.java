@@ -9,13 +9,26 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 public class SongListeningActivity extends Activity {
+
+	TextView songListening_textView_author;
+	SimpleAdapter songListening_adapter_textAuthor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
+
+		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
+		
+		// adapter à faire
+
+	}
+
+	public void songListening_onClick_play(View view) {
 
 	}
 
