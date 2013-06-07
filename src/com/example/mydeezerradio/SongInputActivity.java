@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class SongInput extends Activity {
+public class SongInputActivity extends Activity {
+	
+	public static final String EXTRA_SONGINPUT_SEARCH = "songInput_search_song";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,16 +25,20 @@ public class SongInput extends Activity {
 	}
 
 	public void songInput_onClick_return(View view) {
-		finish();
+		Intent intent = new Intent(this,MainActivity.class);
+		startActivity(intent);
 	}
 
 	public void songInput_onClick_search(View view) {
 
-		String song = String.valueOf(((TextView) view).getText());
+		String song = String
+				.valueOf((((TextView) findViewById(R.id.songInput_editText_song))
+						.getText()));
 
 		if (song.length() > 0) {
-			Intent intent = new Intent(this, SongSelection.class);
-			intent.putExtra("songInput_search_song", song);
+			Log.w("SongInput / songInpu_onClick_search", "chanson :" + song);
+			Intent intent = new Intent(this, SongSelectionActivity.class);
+			intent.putExtra(EXTRA_SONGINPUT_SEARCH, song);
 
 			startActivity(intent);
 		}

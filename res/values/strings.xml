@@ -14,5 +14,7 @@
     <string name="songInput_button_return">Retour</string>
     <string name="title_activity_song_selection">SongSelection</string>
     <string name="songSelection_button_return">Retour</string>
+    <string name="title_activity_song_listening">SongListeningActivity</string>
+    <string name="songListening_button_return">Retour</string>
 
 </resources>

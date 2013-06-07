@@ -16,7 +16,7 @@ public class MainActivity extends Activity {
 	
 	public void main_onClick_connect(View view) {
 		//TODO à refaire avec une vraie version
-		Intent intent = new Intent(this, SongInput.class);
+		Intent intent = new Intent(this, SongInputActivity.class);
 		startActivity(intent);
 	}
 

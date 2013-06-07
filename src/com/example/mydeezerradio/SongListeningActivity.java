@@ -9,41 +9,20 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-public class SongSelection extends Activity {
-
-	ListView songSelection_listView_songList;
-	ArrayAdapter<String> songSelection_adapter_songListAdapter;
+public class SongListeningActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_song_selection);
+		setContentView(R.layout.activity_song_listening);
 		// Show the Up button in the action bar.
 		setupActionBar();
-
-		songSelection_listView_songList = (ListView) findViewById(R.id.songSelection_listView_songList);
-
-		songSelection_adapter_songListAdapter = (ArrayAdapter<String>) songSelection_listView_songList
-				.getAdapter();
-		Intent parent_intent = getIntent();
-
-		String temp_searched_song = parent_intent
-				.getStringExtra("songInput_search_song");
-		
-		
-
-		songSelection_adapter_songListAdapter.add(temp_searched_song);
-
-		songSelection_listView_songList
-				.setAdapter(songSelection_adapter_songListAdapter);
-
 	}
 
-	public void songSelection_onClick_return(View view) {
-		finish();
+	public void songListening_onClick_return(View view) {
+		Intent intent = new Intent(this, SongInputActivity.class);
+		startActivity(intent);
 	}
 
 	/**
@@ -59,7 +38,7 @@ public class SongSelection extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.song_selection, menu);
+		getMenuInflater().inflate(R.menu.song_listening, menu);
 		return true;
 	}
 

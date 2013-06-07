@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.SongInput"
+            android:name="com.example.mydeezerradio.SongInputActivity"
             android:label="@string/title_activity_song_input"
             android:parentActivityName="com.example.mydeezerradio.MainActivity" >
             <meta-data
@@ -33,12 +33,20 @@
                 android:value="com.example.mydeezerradio.MainActivity" />
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.SongSelection"
+            android:name="com.example.mydeezerradio.SongSelectionActivity"
             android:label="@string/title_activity_song_selection"
-            android:parentActivityName="com.example.mydeezerradio.SongInput" >
+            android:parentActivityName="com.example.mydeezerradio.SongInputActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mydeezerradio.SongInput" />
+        </activity>
+        <activity
+            android:name="com.example.mydeezerradio.SongListeningActivity"
+            android:label="@string/title_activity_song_listening"
+            android:parentActivityName="com.example.mydeezerradio.SongSelectionActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.mydeezerradio.SongSelection" />
         </activity>
     </application>
 
