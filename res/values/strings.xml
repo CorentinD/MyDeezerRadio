@@ -16,5 +16,6 @@
     <string name="songSelection_button_return">Retour</string>
     <string name="title_activity_song_listening">SongListeningActivity</string>
     <string name="songListening_button_return">Retour</string>
+    <string name="songListening_imageView_cover_description">Image de couverture</string>
 
 </resources>
