@@ -8,6 +8,8 @@
     <string name="main_editText_password">Mot de passe</string>
     <string name="main_button_connect">Connexion</string>
     <string name="main_textView_rememberMe">Se souvenir de moi</string>
+    <string name="mainV2_button_connect">Connexion</string>
+    <string name="mainV2_button_disconnect">Déconnexion</string>
     <string name="title_activity_song_input">SongInput</string>
     <string name="songInput_editText_song">Chanson de départ ?</string>
     <string name="songInput_button_search">Recherche</string>

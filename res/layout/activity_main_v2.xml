@@ -9,52 +9,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:id="@+id/main_editText_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:ems="13"
-        android:hint="@string/main_editText_email"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/main_editText_password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/main_editText_email"
-        android:layout_alignRight="@+id/main_editText_email"
-        android:layout_below="@+id/main_editText_email"
-        android:layout_centerHorizontal="true"
-        android:hint="@string/main_editText_password"
-        android:inputType="textPassword" />
-
-    <CheckBox
-        android:id="@+id/main_checkBox_rememberMe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/main_editText_email"
-        android:layout_below="@+id/main_editText_password" 
-       	android:checked="true"
-        
-        />
-
     <TextView
-        android:id="@+id/main_textView_rememberMe"
+        android:id="@+id/mainV2_textView_nameUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/main_checkBox_rememberMe"
-        android:layout_toRightOf="@+id/main_checkBox_rememberMe"
-        android:text="@string/main_textView_rememberMe"
-        android:textColor="@android:color/darker_gray" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true" />
 
     <Button
-        android:id="@+id/main_button_connect"
+        android:id="@+id/mainV2_button_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/mainV2_button_disconnect"
+        android:layout_centerHorizontal="true"
+        android:onClick="mainV2_onClick_connect"
+        android:text="@string/mainV2_button_connect" />
+    
+     <Button
+        android:id="@+id/mainV2_button_disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="main_onClick_connect"
-        android:text="@string/main_button_connect" />
+        android:onClick="mainV2_onClick_disconnect"
+        android:text="@string/mainV2_button_disconnect" />
 
 </RelativeLayout>
