@@ -23,7 +23,10 @@ public class SongListeningActivity extends Activity {
 		setContentView(R.layout.activity_song_listening);
 
 		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
-		
+
+		songListening_textView_author.setText(getIntent().getStringExtra(
+				SongSelectionActivity.EXTRA_SONGSELECTION_SELECTION));
+
 		// adapter à faire
 
 	}
