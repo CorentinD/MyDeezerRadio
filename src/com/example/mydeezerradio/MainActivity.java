@@ -40,8 +40,9 @@ public class MainActivity extends Activity {
 	public final static String name_sharedPref = "com.example.mydeezerradio";
 	SharedPreferences sharedPref;
 	SharedPreferences.Editor sharedPref_editor;
-	final String sharedPref_boolean_isConnected = "boolean_isConnected";
+	public final static String sharedPref_boolean_isConnected = "boolean_isConnected";
 	public static String access_token = "";
+	public final static String sharedPref_string_userName = "string_userName";
 
 	/**
 	 * v1 : with shared pref
@@ -108,8 +109,14 @@ public class MainActivity extends Activity {
 
 		if (sharedPref.getBoolean(sharedPref_boolean_isConnected, false)) {
 
-			DeezerRequest request_name = new DeezerRequest("/user/" + userId
-					+ "/name/");
+			Bundle bundle = new Bundle();
+			bundle.putString("access_token", access_token);
+
+//			DeezerRequest request_name = new DeezerRequest(
+//					"/user/me?access_token=" + access_token);
+			
+			DeezerRequest request_name = new DeezerRequest(
+					"/user/"+userId);
 
 			deezerConnect.requestAsync(request_name, requestHandler);
 
@@ -117,8 +124,12 @@ public class MainActivity extends Activity {
 			// deezerConnect, request_name, requestHandler, "name_user");
 
 			Log.w("Main / onResume", "already connected");
+
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
-					.setText("Connected");
+					.setText("Connected, welcome "
+							+ sharedPref.getString(sharedPref_string_userName,
+									"User"));
+
 		} else {
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
 					.setText("Not connected, please log in");
@@ -168,6 +179,8 @@ public class MainActivity extends Activity {
 
 	public void mainV2_onClick_disconnect(View view) {
 		sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, false);
+		sharedPref_editor.putString(sharedPref_string_userName, "NO ONE");
+		sharedPref_editor.commit();
 
 		deezerConnect.logout(MainActivity.this);
 
@@ -199,9 +212,11 @@ public class MainActivity extends Activity {
 	private class LoginDialogHandler implements DialogListener {
 		@Override
 		public void onComplete(final Bundle values) {
+
 			Log.w("Main / onComplete", "OK");
 
 			MainActivity.access_token = values.getString("access_token");
+			Log.e("Main / onComplete", "keySet :" + values.keySet());
 
 			sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, true);
 			sharedPref_editor.commit();
@@ -250,6 +265,12 @@ public class MainActivity extends Activity {
 	private class MyDeezerRequestHandler implements RequestListener {
 		public void onComplete(String response, Object requestId) {
 			// Warning code is not executed in UI Thread
+
+			sharedPref_editor.putString(sharedPref_string_userName,
+					getUserName(response));
+			sharedPref_editor.commit();
+
+			Log.w("Main / requestHandler", "username : " + response);
 			if ("user_name".equals(requestId)) {
 				Toast.makeText(getApplicationContext(), "user !",
 						Toast.LENGTH_SHORT).show();
@@ -278,7 +299,8 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onOAuthException(OAuthException arg0, Object arg1) {
-			Log.w("Main / requestHandler", "onOAuthException");
+			Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
+					+ arg1);
 
 		}
 	}// class
@@ -332,5 +354,51 @@ public class MainActivity extends Activity {
 		// execute the AsyncTask with the executor
 		asyncDeezerTask.executeOnExecutor(executor, request);
 	}
+
+	public String getUserName(String informations) {
+		String res = new String();
+
+		int index_name = informations.indexOf("name\":");
+		int index_userName = index_name + 7;
+
+		int index_link = informations.indexOf("\",\"link");
+
+		res = informations.substring(index_userName, index_link);
+
+		return res;
+	}
+
+	// public User init_user(String informations) {
+	//
+	// int id;
+	// String name;
+	// String lastname;
+	// String firstname;
+	// String email;
+	// int d1;
+	// int m1;
+	// int y1;
+	// int d2;
+	// int m2;
+	// int y2;
+	// String gender;
+	// String link;
+	// String picture;
+	// String country;
+	// String lang;
+	//
+	// String [] informations_tab = informations.split(",");
+	// String [] res_tab = new String [informations_tab.length];
+	//
+	// for (int i = 0 ; i< informations_tab.length ; ++i) {
+	// String current = informations_tab[i];
+	//
+	// int first_index = current.indexOf("\":");
+	// res_tab[i] = current.substring(first_index, current.indexOf("\"",
+	// first_index+1));
+	//
+	// }
+	//
+	// }
 
 }

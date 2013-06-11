@@ -13,8 +13,9 @@ import android.view.View;
 import android.widget.TextView;
 
 public class SongInputActivity extends Activity {
-	
+
 	public static final String EXTRA_SONGINPUT_SEARCH = "songInput_search_song";
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,10 +23,12 @@ public class SongInputActivity extends Activity {
 		setContentView(R.layout.activity_song_input);
 		// Show the Up button in the action bar.
 		setupActionBar();
+
+
 	}
 
 	public void songInput_onClick_return(View view) {
-		Intent intent = new Intent(this,MainActivity.class);
+		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
 	}
 
@@ -78,4 +81,7 @@ public class SongInputActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+		
 }
+
+
