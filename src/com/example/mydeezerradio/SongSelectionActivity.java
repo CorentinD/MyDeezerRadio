@@ -2,6 +2,7 @@ package com.example.mydeezerradio;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -73,7 +74,7 @@ public class SongSelectionActivity extends Activity {
 
 		Bundle bundle = new Bundle();
 		bundle.putString("q", temp_searched_song);
-		bundle.putString("nb_items", "30");
+		bundle.putString("nb_items", "20");
 		DeezerRequest request_songs = new DeezerRequest("search/", bundle);
 		deezerConnect.requestAsync(request_songs, requestHandler);
 
@@ -152,6 +153,9 @@ public class SongSelectionActivity extends Activity {
 			// Warning code is not executed in UI Thread
 
 			Log.w("Main / requestHandler", "username : " + response);
+
+			parseResult(response);
+
 			if ("user_name".equals(requestId)) {
 				Toast.makeText(getApplicationContext(), "user !",
 						Toast.LENGTH_SHORT).show();
@@ -185,5 +189,14 @@ public class SongSelectionActivity extends Activity {
 
 		}
 	}// class
+
+	public ArrayList<Track> parseResult(String informations) {
+		ArrayList<Track> res = new ArrayList<Track>();
+
+		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
+		Log.w("SongSelection / parseResult", "nb_cases : " + info_tab.length);
+
+		return res;
+	}
 
 }
