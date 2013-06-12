@@ -1,5 +1,8 @@
 package com.example.mydeezerradio;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,11 +14,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.deezer.sdk.DeezerConnect;
+import com.deezer.sdk.DeezerConnectImpl;
+import com.deezer.sdk.DeezerError;
+import com.deezer.sdk.DeezerRequest;
+import com.deezer.sdk.OAuthException;
+import com.deezer.sdk.RequestListener;
 
 public class SongInputActivity extends Activity {
 
 	public static final String EXTRA_SONGINPUT_SEARCH = "songInput_search_song";
-
+	/** DeezerConnect object used for auhtentification or request. */
+	private DeezerConnect deezerConnect = new DeezerConnectImpl(
+			MainActivity.APP_ID);
+	/** DeezerRequestListener object used to handle requests. */
+	RequestListener requestHandler = new SongSelectionRequestHandler();
+	public static String song_search_data;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +39,6 @@ public class SongInputActivity extends Activity {
 		setContentView(R.layout.activity_song_input);
 		// Show the Up button in the action bar.
 		setupActionBar();
-
 
 	}
 
@@ -39,11 +54,12 @@ public class SongInputActivity extends Activity {
 						.getText()));
 
 		if (song.length() > 0) {
-			Log.w("SongInput / songInpu_onClick_search", "chanson :" + song);
-			Intent intent = new Intent(this, SongSelectionActivity.class);
-			intent.putExtra(EXTRA_SONGINPUT_SEARCH, song);
 
-			startActivity(intent);
+			Bundle bundle = new Bundle();
+			bundle.putString("q", song);
+			bundle.putString("nb_items", "20");
+			DeezerRequest request_songs = new DeezerRequest("search/", bundle);
+			deezerConnect.requestAsync(request_songs, requestHandler);
 		}
 	}
 
@@ -81,7 +97,51 @@ public class SongInputActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-		
+	private class SongSelectionRequestHandler implements RequestListener {
+		public void onComplete(String response, Object requestId) {
+			// Warning code is not executed in UI Thread
+
+			song_search_data = response;
+			Log.i("SongInput / onComplete", "response : " + response);
+			Log.i("SongInput / onComplete", "data : " + song_search_data);
+
+			Intent intent = new Intent(getApplicationContext(),
+					SongSelectionActivity.class);
+			intent.putExtra(EXTRA_SONGINPUT_SEARCH, song_search_data);
+
+			startActivity(intent);
+
+		}
+
+		public void onIOException(IOException e, Object requestId) {
+			Log.w("Main / requestHandler", "IOException");
+			// TODO. Implement some code to handle error. Warning code is not
+			// executed in UI Thread
+		}
+
+		public void onMalformedURLException(MalformedURLException e,
+				Object requestId) {
+			Log.w("Main / requestHandler", "onMalformedURLException");
+			// TODO. Implement some code to handle error. Warning code is not
+			// executed in UI Thread
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("Main / requestHandler", "onDeezerError : " + arg0.toString());
+
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
+					+ arg1);
+
+		}
+	}// class
+
+	public void handleError(Object e) {
+		Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG)
+				.show();
+	}
 }
-
-

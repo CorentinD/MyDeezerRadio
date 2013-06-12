@@ -1,8 +1,7 @@
 package com.example.mydeezerradio;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -20,14 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.deezer.sdk.DeezerConnect;
-import com.deezer.sdk.DeezerConnectImpl;
-import com.deezer.sdk.DeezerError;
-import com.deezer.sdk.DeezerRequest;
-import com.deezer.sdk.OAuthException;
-import com.deezer.sdk.RequestListener;
 
 public class SongSelectionActivity extends Activity {
 
@@ -36,11 +27,13 @@ public class SongSelectionActivity extends Activity {
 	public static final String EXTRA_SONGSELECTION_SELECTION = "songSelection_clicked_song";
 	SharedPreferences sharedPref;
 	SharedPreferences.Editor sharedPref_editor;
-	/** DeezerConnect object used for auhtentification or request. */
-	private DeezerConnect deezerConnect = new DeezerConnectImpl(
-			MainActivity.APP_ID);
-	/** DeezerRequestListener object used to handle requests. */
-	RequestListener requestHandler = new SongSelectionRequestHandler();
+	// /** DeezerConnect object used for auhtentification or request. */
+	// private DeezerConnect deezerConnect = new DeezerConnectImpl(
+	// MainActivity.APP_ID);
+	// /** DeezerRequestListener object used to handle requests. */
+	// RequestListener requestHandler = new SongSelectionRequestHandler();
+	ArrayList<String> SongSelection_list_searchResults;
+	public final static String songSelection_string_noResults = "No results";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +49,16 @@ public class SongSelectionActivity extends Activity {
 		// Log.w("SongSelection / onCreate()", "création");
 
 		songSelection_listView_songList = (ListView) findViewById(R.id.songSelection_listView_songList);
+		SongSelection_list_searchResults = new ArrayList<String>();
 
 		// Log.w("SongSelection / onCreate()", "init list");
 
 		songSelection_adapter_songListAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1);
+				android.R.layout.simple_list_item_1,
+				SongSelection_list_searchResults);
+
+		songSelection_listView_songList
+				.setAdapter(songSelection_adapter_songListAdapter);
 
 		// Log.w("SongSelection / onCreate()", "init Adapter on :"
 		// + R.id.songSelection_listView_songList);
@@ -71,24 +69,28 @@ public class SongSelectionActivity extends Activity {
 
 		String temp_searched_song = parent_intent
 				.getStringExtra(SongInputActivity.EXTRA_SONGINPUT_SEARCH);
+		
+		Log.i("SongSelection / onCreate", "autre :"+SongInputActivity.song_search_data);
+		Log.i("SongSelection / onCreate", "temp :"+temp_searched_song);
+		
 
-		Bundle bundle = new Bundle();
-		bundle.putString("q", temp_searched_song);
-		bundle.putString("nb_items", "20");
-		DeezerRequest request_songs = new DeezerRequest("search/", bundle);
-		deezerConnect.requestAsync(request_songs, requestHandler);
+		SongSelection_list_searchResults = parseResult(temp_searched_song);
 
-		// Log.w("SongSelection / onCreate()", "init string song : "
-		// + temp_searched_song);
+		// Bundle bundle = new Bundle();
+		// bundle.putString("q", temp_searched_song);
+		// bundle.putString("nb_items", "20");
+		// DeezerRequest request_songs = new DeezerRequest("search/", bundle);
+		// deezerConnect.requestAsync(request_songs, requestHandler);
 
-		songSelection_adapter_songListAdapter.add(temp_searched_song);
+		Iterator<String> it_list_searchedSongs = SongSelection_list_searchResults
+				.iterator();
 
-		// Log.w("SongSelection / onCreate()", "add song to list");
+		while (it_list_searchedSongs.hasNext()) {
+			songSelection_adapter_songListAdapter.add(it_list_searchedSongs
+					.next());
+		}
 
-		songSelection_listView_songList
-				.setAdapter(songSelection_adapter_songListAdapter);
-
-		// Log.w("SongSelection / onCreate()", "set Adapters");
+		// songSelection_adapter_songListAdapter.notifyDataSetChanged();
 
 		songSelection_listView_songList
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -148,55 +150,83 @@ public class SongSelectionActivity extends Activity {
 		}
 	}
 
-	private class SongSelectionRequestHandler implements RequestListener {
-		public void onComplete(String response, Object requestId) {
-			// Warning code is not executed in UI Thread
+	// private class SongSelectionRequestHandler implements RequestListener {
+	// public void onComplete(String response, Object requestId) {
+	// // Warning code is not executed in UI Thread
+	//
+	// Log.w("SongSelection / requestHandler", "list of song : "
+	// + response);
+	//
+	// Log.w("SongSelection / onComplete", "before parsing");
+	// SongSelection_list_searchResults = parseResult(response);
+	//
+	// Log.w("SongSelection / onComplete", "after parsing");
+	//
+	// Log.w("SongSelection / onCreate", "taille listRes :"
+	// + SongSelection_list_searchResults.size());
+	//
+	// }
+	//
+	// public void onIOException(IOException e, Object requestId) {
+	// Log.w("Main / requestHandler", "IOException");
+	// // TODO. Implement some code to handle error. Warning code is not
+	// // executed in UI Thread
+	// }
+	//
+	// public void onMalformedURLException(MalformedURLException e,
+	// Object requestId) {
+	// Log.w("Main / requestHandler", "onMalformedURLException");
+	// // TODO. Implement some code to handle error. Warning code is not
+	// // executed in UI Thread
+	// }
+	//
+	// @Override
+	// public void onDeezerError(DeezerError arg0, Object arg1) {
+	// Log.w("Main / requestHandler", "onDeezerError : " + arg0.toString());
+	//
+	// }
+	//
+	// @Override
+	// public void onOAuthException(OAuthException arg0, Object arg1) {
+	// Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
+	// + arg1);
+	//
+	// }
+	// }// class
 
-			Log.w("Main / requestHandler", "username : " + response);
+	public ArrayList<String> parseResult(String informations) {
 
-			parseResult(response);
+		ArrayList<String> res = new ArrayList<String>();
 
-			if ("user_name".equals(requestId)) {
-				Toast.makeText(getApplicationContext(), "user !",
-						Toast.LENGTH_SHORT).show();
-
-			}
+		if (informations.contains("total\":0")) {
+			res.add(songSelection_string_noResults);
+			return res;
 		}
-
-		public void onIOException(IOException e, Object requestId) {
-			Log.w("Main / requestHandler", "IOException");
-			// TODO. Implement some code to handle error. Warning code is not
-			// executed in UI Thread
-		}
-
-		public void onMalformedURLException(MalformedURLException e,
-				Object requestId) {
-			Log.w("Main / requestHandler", "onMalformedURLException");
-			// TODO. Implement some code to handle error. Warning code is not
-			// executed in UI Thread
-		}
-
-		@Override
-		public void onDeezerError(DeezerError arg0, Object arg1) {
-			Log.w("Main / requestHandler", "onDeezerError : " + arg0.toString());
-
-		}
-
-		@Override
-		public void onOAuthException(OAuthException arg0, Object arg1) {
-			Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
-					+ arg1);
-
-		}
-	}// class
-
-	public ArrayList<Track> parseResult(String informations) {
-		ArrayList<Track> res = new ArrayList<Track>();
 
 		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
 		Log.w("SongSelection / parseResult", "nb_cases : " + info_tab.length);
 
+		for (int i = 0; i < info_tab.length; ++i) {
+			String current = info_tab[i];
+
+			int index_name = current.indexOf("title\":");
+			int index_userName = index_name + 8;
+
+			int index_link = current.indexOf("\",\"link");
+
+			current = current.substring(index_userName, index_link);
+
+			res.add(current);
+
+		}
+
+		Log.i("SongSelection / parseResults", "res :" + res);
 		return res;
 	}
+
+	// public void handleError(Object e) {
+	// Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG)
+	// .show();
+	// }
 
 }
