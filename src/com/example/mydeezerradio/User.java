@@ -63,5 +63,9 @@ public class User implements Thumbnailable {
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}// met
+	
+	public String toString() {
+		return (firstname+" "+lastname);
+	}
 }// class
 

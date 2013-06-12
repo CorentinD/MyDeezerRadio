@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 	public final static String sharedPref_boolean_isConnected = "boolean_isConnected";
 	public static String access_token = "";
 	public final static String sharedPref_string_userName = "string_userName";
-	public static User user_data;
+	public static User user_data = new User();
 
 	/** Your app Deezer appId. */
 	public final static String APP_ID = "119355";
@@ -58,6 +58,8 @@ public class MainActivity extends Activity {
 	private RequestListener requestHandler = new MyDeezerRequestHandler();
 
 	private RequestListener userRequestListenerHandler = new UserRequestHandler();
+	
+	private RequestListener userDataRequestHandler = new UserDataRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +72,6 @@ public class MainActivity extends Activity {
 			sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, false);
 		}
 
-		user_data = new User();
 	}
 
 	protected void onResume() {
@@ -92,6 +93,7 @@ public class MainActivity extends Activity {
 		}
 
 		searchUser();
+		Log.i("MainActivity / onResume", "user data : " + user_data);
 	}
 
 	public void mainV2_onClick_connect(View view) {
@@ -164,7 +166,6 @@ public class MainActivity extends Activity {
 			sharedPref_editor.putString(sharedPref_string_userName,
 					getUserName(response));
 			sharedPref_editor.commit();
-
 			Log.w("Main / requestHandler", "username : " + response);
 
 		}
@@ -192,18 +193,19 @@ public class MainActivity extends Activity {
 	}// class
 
 	public void searchUser() {
-		AsyncDeezerTask searchAsyncUser = new AsyncDeezerTaskWithDialog(this,
-				deezerConnect, userRequestListenerHandler);
 		DeezerRequest request = new DeezerRequest("user/me");
+		AsyncDeezerTask searchAsyncUser = new AsyncDeezerTask(deezerConnect,
+				userDataRequestHandler);
 		searchAsyncUser.execute(request);
 
 	}
 
 	public void searchUserFinish(User user) {
-		user_data.setFirstname(user.getFirstname());
-		user_data.setLastname(user.getLastname());
-		user_data.setBirthday(user.getBirthday());
-		user_data.setPicture(user.getPicture());
+		Log.i("MainActivity / searchUserFinish", "user request : " + user);
+//		user_data.setFirstname(user.getFirstname());
+//		user_data.setLastname(user.getLastname());
+//		user_data.setBirthday(user.getBirthday());
+//		user_data.setPicture(user.getPicture());
 	}
 
 	private class UserRequestHandler implements RequestListener {
@@ -212,8 +214,8 @@ public class MainActivity extends Activity {
 			try {
 				User user = new DeezerDataReader<User>(User.class)
 						.read(response);
-
-				searchUserFinish(user);
+				Log.i("MainActivity / onComplete", "user request : " + user);
+				searchUserFinish(user); 
 			} catch (IllegalStateException e) {
 				handleError(e);
 				e.printStackTrace();
@@ -248,60 +250,8 @@ public class MainActivity extends Activity {
 	}
 
 	public void handleError(Object e) {
-		Log.e("Error :", e.toString());
+		Log.e("MainActivity / Error :", e.toString());
 	}
-
-	public class AsyncDeezerTaskWithDialog extends AsyncDeezerTask {
-		/** Progress dialog to show user that the request is beeing processed. */
-		private ProgressDialog progressDialog;
-
-		public AsyncDeezerTaskWithDialog(Context context,
-				DeezerConnect deezerConnect, RequestListener listener) {
-			super(deezerConnect, listener);
-			progressDialog = new ProgressDialog(context);
-			progressDialog.setCancelable(true);
-			progressDialog.setOnCancelListener(new OnCancelHandler());
-		}// met
-
-		@Override
-		protected void onPreExecute() {
-			progressDialog.setMessage("Contacting Deezer...");
-			progressDialog.show();
-			super.onPreExecute();
-		}// met
-
-		@Override
-		public void onPostExecute(String s) {
-			try {
-				if (progressDialog.isShowing()) {
-					progressDialog.dismiss();
-				}// if
-			} catch (IllegalArgumentException e) {
-				// can happen sometimes, and nothing to get against it
-			}// catch
-			super.onPostExecute(s);
-		}// met
-
-		@Override
-		protected void onCancelled() {
-			try {
-				if (progressDialog.isShowing()) {
-					progressDialog.dismiss();
-				}// if
-			} catch (IllegalArgumentException e) {
-				// can happen sometimes, and nothing to get against it
-			}// catch
-			super.onCancelled();
-		}// met
-
-		private class OnCancelHandler implements OnCancelListener {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				cancel(true);
-			}// met
-		}// inner class
-
-	}// AsyncDeezerTaskWithDialog
 
 	public String getUserName(String informations) {
 		String res = new String();
@@ -316,6 +266,65 @@ public class MainActivity extends Activity {
 		Log.i("MainActivity / getUserName", res);
 
 		return res;
+	}
+
+	public class UserDataRequestHandler implements RequestListener {
+
+		@Override
+		public void onComplete(String response, Object arg1) {
+			Log.i("onCompleteUserRequestHandler", "String : " + response);
+
+			try {
+				// Searching the right USER
+				User user = new DeezerDataReader<User>(User.class)
+						.read(response);
+				Log.i("onCompleteUserRequestHandler", "UserDataReader");
+				searchUserFinish(user);
+				Log.i("onCompleteUserRequestHandler", "searchUserFinish");
+
+				// Receiving user's userID
+				user_data = user;
+				userId = user_data.getThumbnailUrl();
+				int first = userId.indexOf("/user/");
+				int second = userId.indexOf("/image");
+				userId = userId.substring((first + 6), second);
+				Log.i("onCompleteUserRequestHandler", "userID : " + userId);
+
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			}
+
+			// Intent intent = new Intent(getApplicationContext(),
+			// SongInputActivity.class);
+			// startActivity(intent);
+
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			Log.w("onDeezerError", "ERROR");
+		}
+
+		@Override
+		public void onIOException(IOException arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			Log.w("onIOException", "ERROR");
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException arg0,
+				Object arg1) {
+			// TODO Auto-generated method stub
+			Log.w("onMalformedURLException", "ERROR");
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			Log.w("onOAuthException", arg0);
+		}
+
 	}
 
 	@Override
