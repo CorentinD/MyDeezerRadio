@@ -5,10 +5,7 @@ import java.net.MalformedURLException;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -202,10 +199,6 @@ public class MainActivity extends Activity {
 
 	public void searchUserFinish(User user) {
 		Log.i("MainActivity / searchUserFinish", "user request : " + user);
-//		user_data.setFirstname(user.getFirstname());
-//		user_data.setLastname(user.getLastname());
-//		user_data.setBirthday(user.getBirthday());
-//		user_data.setPicture(user.getPicture());
 	}
 
 	private class UserRequestHandler implements RequestListener {

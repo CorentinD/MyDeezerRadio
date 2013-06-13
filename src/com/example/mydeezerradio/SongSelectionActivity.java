@@ -51,19 +51,23 @@ public class SongSelectionActivity extends Activity {
 		songSelection_listView_songList
 				.setAdapter(songSelection_adapter_songListAdapter);
 
-		Intent parent_intent = getIntent();
+		// Intent parent_intent = getIntent();
 
-		String temp_searched_song = parent_intent
-				.getStringExtra(SongInputActivity.EXTRA_SONGINPUT_SEARCH);
+		// String temp_searched_song = parent_intent
+		// .getStringExtra(SongInputActivity.EXTRA_SONGINPUT_SEARCH);
 
-		SongSelection_list_searchResults = parseResult(temp_searched_song);
+		// SongSelection_list_searchResults = parseResult(temp_searched_song);
 
-		Iterator<String> it_list_searchedSongs = SongSelection_list_searchResults
+		// Iterator<String> it_list_searchedSongs =
+		// SongSelection_list_searchResults
+		// .iterator();
+
+		Iterator<Track> it_list_searchedSongs = SongInputActivity.listTracks
 				.iterator();
 
 		while (it_list_searchedSongs.hasNext()) {
 			songSelection_adapter_songListAdapter.add(it_list_searchedSongs
-					.next());
+					.next().toString());
 		}
 
 		songSelection_listView_songList
@@ -136,12 +140,12 @@ public class SongSelectionActivity extends Activity {
 
 		for (int i = 0; i < info_tab.length; ++i) {
 			String current = info_tab[i];
-			//song
+			// song
 			int index_title = current.indexOf("title\":") + 8;
 			int index_link = current.indexOf("\",\"link");
 			String current_title = current.substring(index_title, index_link);
 
-			//artist
+			// artist
 			int index_artist = current.indexOf("name\":") + 7;
 			int index_link2 = current.indexOf("\",\"link", index_artist);
 			String current_artist = current
@@ -155,9 +159,4 @@ public class SongSelectionActivity extends Activity {
 		return res;
 	}
 
-	// public void handleError(Object e) {
-	// Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG)
-	// .show();
-	// }
-
-}
+} // SongSelectionActivity

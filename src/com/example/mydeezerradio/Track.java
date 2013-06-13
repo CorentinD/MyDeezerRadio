@@ -70,7 +70,7 @@ public class Track {
 
 	@Override
 	public String toString() {
-		return title;
+		return title + " by " + artist;
 	}// met
 
 	public boolean hasStream() {

@@ -2,6 +2,7 @@ package com.example.mydeezerradio;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -30,6 +31,7 @@ public class SongInputActivity extends Activity {
 			MainActivity.APP_ID);
 	/** DeezerRequestListener object used to handle requests. */
 	RequestListener requestHandler = new SongSelectionRequestHandler();
+	public static List<Track> listTracks;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class SongInputActivity extends Activity {
 		setContentView(R.layout.activity_song_input);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		listTracks = null;
 	}
 
 	public void songInput_onClick_return(View view) {
@@ -59,11 +62,29 @@ public class SongInputActivity extends Activity {
 		}
 	}
 
+	private void TrackSearchComplete(List<Track> listReceived) {
+		Log.w("SongInput / TrackSearchComplete","done");
+	}
+	
 	private class SongSelectionRequestHandler implements RequestListener {
 		public void onComplete(String response, Object requestId) {
+			try {
+//				Log.w("SongInput / onComplete", "receive json : "
+//						+ response);
+				listTracks = new ListDeezerDataReader<Track>(Track.class)
+						.readList(response);
+				Log.w("SongInput / onComplete", "received Track list : "
+						+ listTracks);
+				TrackSearchComplete(listTracks);
+			} catch (IllegalStateException e) {
+				Log.e("SongInput / onComplete", "IllegalStateException : "
+						+ e);
+				e.printStackTrace();
+			}// catch
+
 			Intent intent = new Intent(getApplicationContext(),
 					SongSelectionActivity.class);
-			intent.putExtra(EXTRA_SONGINPUT_SEARCH, response);
+			// intent.putExtra(EXTRA_SONGINPUT_SEARCH, response);
 
 			startActivity(intent);
 		}
@@ -122,4 +143,4 @@ public class SongInputActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-}// 
+}//
