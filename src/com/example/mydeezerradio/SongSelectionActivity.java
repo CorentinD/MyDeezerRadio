@@ -29,6 +29,7 @@ public class SongSelectionActivity extends Activity {
 	SharedPreferences.Editor sharedPref_editor;
 	ArrayList<String> SongSelection_list_searchResults;
 	public final static String songSelection_string_noResults = "No results";
+	public static Track trackSelected;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,17 +52,6 @@ public class SongSelectionActivity extends Activity {
 		songSelection_listView_songList
 				.setAdapter(songSelection_adapter_songListAdapter);
 
-		// Intent parent_intent = getIntent();
-
-		// String temp_searched_song = parent_intent
-		// .getStringExtra(SongInputActivity.EXTRA_SONGINPUT_SEARCH);
-
-		// SongSelection_list_searchResults = parseResult(temp_searched_song);
-
-		// Iterator<String> it_list_searchedSongs =
-		// SongSelection_list_searchResults
-		// .iterator();
-
 		Iterator<Track> it_list_searchedSongs = SongInputActivity.listTracks
 				.iterator();
 
@@ -76,13 +66,16 @@ public class SongSelectionActivity extends Activity {
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
 
-						String temp_clicked_song = String
-								.valueOf(((TextView) v).getText());
+						// String temp_clicked_song = String
+						// .valueOf(((TextView) v).getText());
+
+						trackSelected = SongInputActivity.listTracks
+								.get(position);
 
 						Intent intent = new Intent(getApplicationContext(),
 								SongListeningActivity.class);
-						intent.putExtra(EXTRA_SONGSELECTION_SELECTION,
-								temp_clicked_song);
+						// intent.putExtra(EXTRA_SONGSELECTION_SELECTION,
+						// temp_clicked_song);
 						startActivity(intent);
 					}
 				});

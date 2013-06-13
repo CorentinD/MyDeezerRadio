@@ -71,7 +71,8 @@ public class Artist implements Thumbnailable {
 
 	@Override
 	public String toString() {
-		return "Artist [id=" + id + ", name=" + name + ", image=" + picture
-				+ "]";
+		return name;
 	}// met
+	
+
 }// class
