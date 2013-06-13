@@ -1,5 +1,8 @@
 package com.example.mydeezerradio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -34,15 +37,16 @@ public class SongListeningActivity extends Activity {
 
 	TextView songListening_textView_author;
 	SimpleAdapter songListening_adapter_textAuthor;
-	private Player player;
+	private Player songListening_player_songPlayer;
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
 	private PlayerHandler playerHandler = new PlayerHandler();
+	List<Track> songListening_list_futureSongs = new ArrayList<Track>();
 
 	protected void onPause() {
 		super.onPause();
-		player.stop();
-		player.release();
+		songListening_player_songPlayer.stop();
+		songListening_player_songPlayer.release();
 	}
 
 	@Override
@@ -62,15 +66,22 @@ public class SongListeningActivity extends Activity {
 				+ SongSelectionActivity.trackSelected.getPreview());
 
 		try {
-			player = new DefaultPlayerFactory(getApplication(), deezerConnect,
+			songListening_player_songPlayer = new DefaultPlayerFactory(
+					getApplication(), deezerConnect,
 					new WifiOnlyNetworkStateChecker()).createPlayer();
 
-			player.addOnBufferErrorListener(playerHandler);
-			player.addOnBufferStateChangeListener(playerHandler);
-			player.addOnBufferProgressListener(playerHandler);
-			player.addOnPlayerErrorListener(playerHandler);
-			player.addOnPlayerStateChangeListener(playerHandler);
-			player.addOnPlayerProgressListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnBufferErrorListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnBufferStateChangeListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnBufferProgressListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnPlayerErrorListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnPlayerStateChangeListener(playerHandler);
+			songListening_player_songPlayer
+					.addOnPlayerProgressListener(playerHandler);
 
 			Log.i("SongListening / onCreate", "network available : "
 					+ new WifiOnlyNetworkStateChecker().isNetworkAvailable());
@@ -94,10 +105,17 @@ public class SongListeningActivity extends Activity {
 		Log.i("SongListening / songListening_onClick_play", "Song : "
 				+ SongSelectionActivity.trackSelected);
 
-		player.init(SongSelectionActivity.trackSelected.getId(),
-				SongSelectionActivity.trackSelected.getPreview());
-		player.play();
-		
+		if (SongSelectionActivity.trackSelected.hasStream()) {
+			songListening_player_songPlayer.init(
+					SongSelectionActivity.trackSelected.getId(),
+					SongSelectionActivity.trackSelected.getStream());
+		} else {
+			songListening_player_songPlayer.init(
+					SongSelectionActivity.trackSelected.getId(),
+					SongSelectionActivity.trackSelected.getPreview());
+		}
+		songListening_player_songPlayer.play();
+
 	}
 
 	public void songListening_onClick_return(View view) {
@@ -171,6 +189,14 @@ public class SongListeningActivity extends Activity {
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
+
+	List<Track> songListening_nextSongs(Track current_track) {
+		List<Track> res = new ArrayList<Track>();
+
+		// TODO : something here
+
+		return res;
+	}
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.

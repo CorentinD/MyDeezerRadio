@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class SongSelectionActivity extends Activity {
 
@@ -66,16 +65,12 @@ public class SongSelectionActivity extends Activity {
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
 
-						// String temp_clicked_song = String
-						// .valueOf(((TextView) v).getText());
-
 						trackSelected = SongInputActivity.listTracks
 								.get(position);
 
 						Intent intent = new Intent(getApplicationContext(),
 								SongListeningActivity.class);
-						// intent.putExtra(EXTRA_SONGSELECTION_SELECTION,
-						// temp_clicked_song);
+
 						startActivity(intent);
 					}
 				});
