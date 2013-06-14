@@ -24,6 +24,7 @@ import com.deezer.sdk.DialogError;
 import com.deezer.sdk.DialogListener;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
+import com.deezer.sdk.SessionStore;
 
 public class MainActivity extends Activity {
 
@@ -35,10 +36,10 @@ public class MainActivity extends Activity {
 	public final static String name_sharedPref = "com.example.mydeezerradio";
 	SharedPreferences sharedPref;
 	SharedPreferences.Editor sharedPref_editor;
-	public final static String sharedPref_boolean_isConnected = "boolean_isConnected";
-	public static String access_token = "";
+	public static String access_token = null;
 	public final static String sharedPref_string_userName = "string_userName";
 	public static User user_data = new User();
+	boolean isConnected;
 
 	/** Your app Deezer appId. */
 	public final static String APP_ID = "119355";
@@ -47,19 +48,12 @@ public class MainActivity extends Activity {
 			Manifest.permission.ACCESS_NETWORK_STATE,
 			Manifest.permission.INTERNET, Manifest.permission.WAKE_LOCK,
 			Manifest.permission.READ_PHONE_STATE,
-			Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-	};
+			Manifest.permission.WRITE_EXTERNAL_STORAGE };
 	/** DeezerConnect object used for authentification or request. */
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(APP_ID);
 
 	/** DeezerRequestListener object used to handle requests. */
-	// private RequestListener requestHandler = new MyDeezerRequestHandler();
-
 	private RequestListener userRequestListenerHandler = new UserRequestHandler();
-
-	// private RequestListener userDataRequestHandler = new
-	// UserDataRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,25 +62,21 @@ public class MainActivity extends Activity {
 
 		sharedPref = getSharedPreferences(name_sharedPref, Context.MODE_PRIVATE);
 		sharedPref_editor = sharedPref.edit();
-		Log.w("MainActivity / onCreate",
-				"isConnected exist : "
-						+ sharedPref.contains(sharedPref_boolean_isConnected));
 
-		if (!sharedPref.contains(sharedPref_boolean_isConnected)) {
-			// if there's nothing stocked, initialize to false
-			sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, false);
+		SessionStore sessionStore = new SessionStore();
+		isConnected = sessionStore.restore(deezerConnect, this);
+
+		if (isConnected) {
+			Toast.makeText(this, "Already logged in !", Toast.LENGTH_SHORT)
+					.show();
 		}
-
-		sharedPref_editor.commit();
-
 	}
 
 	protected void onResume() {
 		super.onResume();
 
-		if (sharedPref.getBoolean(sharedPref_boolean_isConnected, false)) {
+		if (isConnected) {
 			// if the user is connected, get the user info
-			deezerConnect.setAccessToken(getApplicationContext(), access_token);
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
 					.setText("Connected, welcome "
 							+ sharedPref.getString(sharedPref_string_userName,
@@ -95,31 +85,18 @@ public class MainActivity extends Activity {
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
 					.setText("Not connected, please log in");
 		}
-
-		searchUser();
 		Log.i("MainActivity / onResume", "user data : " + user_data);
-	}
-
-	protected void onPause() {
-		super.onPause();
-
-		if (!sharedPref.getBoolean(sharedPref_boolean_isConnected, false)) {
-			// if the user isn't connected, clear all the data when the activity
-			// exits
-			user_data = new User();
-			sharedPref_editor.remove(sharedPref_boolean_isConnected);
-			sharedPref_editor.clear();
-			sharedPref_editor.commit();
-		}
-
-		Log.i("MainActivity / onDestroy",
-				"isConnected exist : "
-						+ sharedPref.contains(sharedPref_boolean_isConnected));
-
 	}
 
 	public void mainV2_onClick_connect(View view) {
 		// Attempt to connect
+		
+		if (deezerConnect==null) {
+			deezerConnect = new DeezerConnectImpl(APP_ID);
+			SessionStore sessionStore = new SessionStore();
+			sessionStore.restore(deezerConnect, this);
+		}
+		
 		deezerConnect.authorize(MainActivity.this, PERMISSIONS,
 				new LoginDialogHandler());
 
@@ -127,17 +104,20 @@ public class MainActivity extends Activity {
 
 	public void mainV2_onClick_disconnect(View view) {
 
-		deezerConnect.logout(MainActivity.this);
-		// SessionStore sess = new SessionStore();
-		// sess.clear(getApplicationContext());
+		SessionStore sess = new SessionStore();
+		sess.clear(getApplicationContext());
+		
+		//deezerConnect.logout(MainActivity.this);
+		deezerConnect = null;		
+		isConnected = false;
+		access_token = null;
+		user_data = new User();
 
 		Toast.makeText(getApplicationContext(), "disconnected",
 				Toast.LENGTH_SHORT).show();
 		((TextView) findViewById(R.id.mainV2_textView_nameUser))
 				.setText("Déconnecté");
 
-		// when the user log out, isConnected become false
-		sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, false);
 		sharedPref_editor.putString(sharedPref_string_userName, "NO ONE");
 		sharedPref_editor.commit();
 
@@ -150,15 +130,14 @@ public class MainActivity extends Activity {
 
 			MainActivity.access_token = values.getString("access_token");
 
-			// if the log in is successful, the user is connected
-			sharedPref_editor.putBoolean(sharedPref_boolean_isConnected, true);
-			sharedPref_editor.commit();
+			SessionStore sessionStore = new SessionStore();
+			sessionStore.save(deezerConnect, MainActivity.this);
 
 			Toast.makeText(getApplicationContext(), "Connected",
 					Toast.LENGTH_SHORT).show();
+			Log.w("MainActivity / onComplete", access_token);
 
-			Log.w("oncomplete", access_token);
-
+			searchUser();
 			// go to the inputSong activity
 			Intent intent = new Intent(getApplicationContext(),
 					SongInputActivity.class);
@@ -187,38 +166,6 @@ public class MainActivity extends Activity {
 		}// met
 	}// inner class
 
-	// private class MyDeezerRequestHandler implements RequestListener {
-	// public void onComplete(String response, Object requestId) {
-	// // Warning code is not executed in UI Thread
-	// sharedPref_editor.putString(sharedPref_string_userName,
-	// getUserName(response));
-	// sharedPref_editor.commit();
-	// Log.w("Main / requestHandler", "username : " + response);
-	//
-	// }
-	//
-	// public void onIOException(IOException e, Object requestId) {
-	// Log.w("Main / requestHandler", "IOException");
-	// }
-	//
-	// public void onMalformedURLException(MalformedURLException e,
-	// Object requestId) {
-	// Log.w("Main / requestHandler", "onMalformedURLException");
-	// }
-	//
-	// @Override
-	// public void onDeezerError(DeezerError arg0, Object arg1) {
-	// Log.w("Main / requestHandler", "onDeezerError : " + arg0.toString());
-	// }
-	//
-	// @Override
-	// public void onOAuthException(OAuthException arg0, Object arg1) {
-	// Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
-	// + arg1);
-	//
-	// }
-	// }// class
-
 	public void searchUser() {
 		DeezerRequest request = new DeezerRequest("user/me");
 		AsyncDeezerTask searchAsyncUser = new AsyncDeezerTask(deezerConnect,
@@ -230,6 +177,7 @@ public class MainActivity extends Activity {
 	public void searchUserFinish(User user) {
 		sharedPref_editor.putString(sharedPref_string_userName,
 				user.getFirstname());
+		sharedPref_editor.commit();
 		Log.i("MainActivity / searchUserFinish", "user request : " + user);
 	}
 
@@ -277,72 +225,6 @@ public class MainActivity extends Activity {
 	public void handleError(Object e) {
 		Log.e("MainActivity / Error :", e.toString());
 	}
-
-	public String getUserName(String informations) {
-		String res = new String();
-
-		int index_name = informations.indexOf("firstname\":");
-		int index_userName = index_name + 12;
-
-		int index_link = informations.indexOf("\",\"birthday");
-
-		res = informations.substring(index_userName, index_link);
-
-		Log.i("MainActivity / getUserName", res);
-
-		return res;
-	}
-
-	// public class UserDataRequestHandler implements RequestListener {
-	//
-	// @Override
-	// public void onComplete(String response, Object arg1) {
-	// Log.i("onCompleteUserRequestHandler", "String : " + response);
-	//
-	// try {
-	// // Searching the right USER
-	// User user = new DeezerDataReader<User>(User.class)
-	// .read(response);
-	// Log.i("onCompleteUserRequestHandler", "UserDataReader");
-	// searchUserFinish(user);
-	// Log.i("onCompleteUserRequestHandler", "searchUserFinish");
-	//
-	// // Receiving user's userID
-	// user_data = user;
-	// userId = user_data.getThumbnailUrl();
-	// int first = userId.indexOf("/user/");
-	// int second = userId.indexOf("/image");
-	// userId = userId.substring((first + 6), second);
-	// Log.i("onCompleteUserRequestHandler", "userID : " + userId);
-	//
-	// } catch (IllegalStateException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	//
-	// @Override
-	// public void onDeezerError(DeezerError arg0, Object arg1) {
-	// Log.w("onDeezerError", "ERROR");
-	// }
-	//
-	// @Override
-	// public void onIOException(IOException arg0, Object arg1) {
-	// Log.w("onIOException", "ERROR");
-	// }
-	//
-	// @Override
-	// public void onMalformedURLException(MalformedURLException arg0,
-	// Object arg1) {
-	// Log.w("onMalformedURLException", "ERROR");
-	// }
-	//
-	// @Override
-	// public void onOAuthException(OAuthException arg0, Object arg1) {
-	// Log.w("onOAuthException", arg0);
-	// }
-	//
-	// }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

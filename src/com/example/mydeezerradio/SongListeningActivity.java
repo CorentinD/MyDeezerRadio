@@ -25,6 +25,7 @@ import com.deezer.sdk.DeezerError;
 import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
+import com.deezer.sdk.SessionStore;
 import com.deezer.sdk.player.Player;
 import com.deezer.sdk.player.TooManyPlayersExceptions;
 import com.deezer.sdk.player.event.BufferState;
@@ -69,8 +70,10 @@ public class SongListeningActivity extends Activity {
 		songListening_textView_author
 				.setText(SongSelectionActivity.trackSelected.toString());
 
-		deezerConnect.setAccessToken(getApplicationContext(),
-				MainActivity.access_token);
+//		deezerConnect.setAccessToken(getApplicationContext(),
+//				MainActivity.access_token);
+		SessionStore sessionStore = new SessionStore();
+		sessionStore.restore(deezerConnect, this);
 
 		Log.i("SongListening / onCreate", "track preview :"
 				+ SongSelectionActivity.trackSelected.getPreview());
@@ -219,19 +222,18 @@ public class SongListeningActivity extends Activity {
 	}
 
 	private class NextSongSearchHandler implements RequestListener {
+		@SuppressWarnings("unchecked")
 		public void onComplete(String response, Object requestId) {
 			try {
 
 				ArrayList<Integer> temp_parsed = parseResult(response);
-
 				List<Artist> temp_list = new ListDeezerDataReader<Artist>(
 						Artist.class).readList(response);
 
+				// adding informations to the artist fo the sorting
 				add_nbFans(temp_list, temp_parsed);
-
 				// Sorting by decreasing number of fans
 				Collections.sort(temp_list);
-
 				// Take one of the 5 best
 				Artist temp_artist = temp_list.get((int) (Math.random() * 5));
 
@@ -244,7 +246,6 @@ public class SongListeningActivity extends Activity {
 						+ e);
 				e.printStackTrace();
 			}// catch
-
 		}
 
 		public void onIOException(IOException e, Object requestId) {

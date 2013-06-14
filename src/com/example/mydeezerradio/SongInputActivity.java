@@ -22,6 +22,7 @@ import com.deezer.sdk.DeezerError;
 import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
+import com.deezer.sdk.SessionStore;
 
 public class SongInputActivity extends Activity {
 
@@ -39,6 +40,10 @@ public class SongInputActivity extends Activity {
 		setContentView(R.layout.activity_song_input);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
+		SessionStore sessionStore = new SessionStore();
+		sessionStore.restore(deezerConnect, this);
+		
 		listTracks = null;
 	}
 

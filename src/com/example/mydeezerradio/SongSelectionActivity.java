@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,39 +111,6 @@ public class SongSelectionActivity extends Activity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
-	}
-
-	public ArrayList<String> parseResult(String informations) {
-
-		ArrayList<String> res = new ArrayList<String>();
-
-		if (informations.contains("total\":0")) {
-			res.add(songSelection_string_noResults);
-			return res;
-		}
-
-		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
-		Log.w("SongSelection / parseResult", "nb_cases : " + info_tab.length);
-
-		for (int i = 0; i < info_tab.length; ++i) {
-			String current = info_tab[i];
-			// song
-			int index_title = current.indexOf("title\":") + 8;
-			int index_link = current.indexOf("\",\"link");
-			String current_title = current.substring(index_title, index_link);
-
-			// artist
-			int index_artist = current.indexOf("name\":") + 7;
-			int index_link2 = current.indexOf("\",\"link", index_artist);
-			String current_artist = current
-					.substring(index_artist, index_link2);
-
-			res.add(current_title + " by " + current_artist);
-
-		}
-
-		Log.i("SongSelection / parseResults", "res :" + res);
-		return res;
 	}
 
 } // SongSelectionActivity
