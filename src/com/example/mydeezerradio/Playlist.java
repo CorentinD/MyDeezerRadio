@@ -63,4 +63,10 @@ public class Playlist implements Thumbnailable {
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}//met
+
+	@Override
+	public int compareTo(Object another) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }//class

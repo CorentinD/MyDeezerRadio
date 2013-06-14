@@ -30,7 +30,7 @@ public class SongInputActivity extends Activity {
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
 	/** DeezerRequestListener object used to handle requests. */
-	RequestListener requestHandler = new SongSelectionRequestHandler();
+	RequestListener requestHandler = new SongInputRequestHandler();
 	public static List<Track> listTracks;
 
 	@Override
@@ -66,7 +66,7 @@ public class SongInputActivity extends Activity {
 		Log.w("SongInput / TrackSearchComplete","done");
 	}
 	
-	private class SongSelectionRequestHandler implements RequestListener {
+	private class SongInputRequestHandler implements RequestListener {
 		public void onComplete(String response, Object requestId) {
 			try {
 //				Log.w("SongInput / onComplete", "receive json : "

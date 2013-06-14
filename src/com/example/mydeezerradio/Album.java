@@ -73,4 +73,10 @@ public class Album implements Thumbnailable {
 	public void setListTrack(List<Track> listTrack) {
 		this.listTrack = listTrack;
 	}// met
+
+	@Override
+	public int compareTo(Object another) {
+		
+		return 0;
+	}
 }// class

@@ -67,5 +67,11 @@ public class User implements Thumbnailable {
 	public String toString() {
 		return (firstname+" "+lastname);
 	}
+
+	@Override
+	public int compareTo(Object another) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }// class
 

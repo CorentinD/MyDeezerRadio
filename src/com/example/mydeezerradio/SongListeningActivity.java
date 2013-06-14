@@ -1,6 +1,9 @@
 package com.example.mydeezerradio;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.annotation.TargetApi;
@@ -19,7 +22,9 @@ import android.widget.TextView;
 import com.deezer.sdk.DeezerConnect;
 import com.deezer.sdk.DeezerConnectImpl;
 import com.deezer.sdk.DeezerError;
+import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
+import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.player.Player;
 import com.deezer.sdk.player.TooManyPlayersExceptions;
 import com.deezer.sdk.player.event.BufferState;
@@ -42,6 +47,11 @@ public class SongListeningActivity extends Activity {
 			MainActivity.APP_ID);
 	private PlayerHandler playerHandler = new PlayerHandler();
 	List<Track> songListening_list_futureSongs = new ArrayList<Track>();
+	RequestListener nextSongRequestHandler = new NextSongSearchHandler();
+	RequestListener topSongRequestHandler = new TopSongSearchHandler();
+	Track songListening_track_trackToAdd;
+	Track temp_track;
+	int i = 0;
 
 	protected void onPause() {
 		super.onPause();
@@ -95,6 +105,8 @@ public class SongListeningActivity extends Activity {
 			Log.e("SongListening / onCreate", "TooManyPlayersExceptions : " + e);
 		}
 
+		songListening_nextSongs(SongSelectionActivity.trackSelected);
+
 		// adapter à faire
 
 	}
@@ -104,16 +116,16 @@ public class SongListeningActivity extends Activity {
 
 		Log.i("SongListening / songListening_onClick_play", "Song : "
 				+ SongSelectionActivity.trackSelected);
-
-		if (SongSelectionActivity.trackSelected.hasStream()) {
-			songListening_player_songPlayer.init(
-					SongSelectionActivity.trackSelected.getId(),
-					SongSelectionActivity.trackSelected.getStream());
-		} else {
-			songListening_player_songPlayer.init(
-					SongSelectionActivity.trackSelected.getId(),
-					SongSelectionActivity.trackSelected.getPreview());
-		}
+		//
+		// if (SongSelectionActivity.trackSelected.hasStream()) {
+		// songListening_player_songPlayer.init(
+		// SongSelectionActivity.trackSelected.getId(),
+		// SongSelectionActivity.trackSelected.getStream());
+		// } else {
+		songListening_player_songPlayer.init(
+				SongSelectionActivity.trackSelected.getId(),
+				SongSelectionActivity.trackSelected.getPreview());
+		// }
 		songListening_player_songPlayer.play();
 
 	}
@@ -190,12 +202,165 @@ public class SongListeningActivity extends Activity {
 		}// met
 	}// inner class
 
-	List<Track> songListening_nextSongs(Track current_track) {
-		List<Track> res = new ArrayList<Track>();
+	void songListening_nextSongs(Track current_track) {
 
 		// TODO : something here
+		temp_track = current_track;
 
+		for (int j = 0; j < 5; ++j) {
+			Log.e("SongListening / test", "par où passes tu ?");
+
+			DeezerRequest request_songs = new DeezerRequest("artist/"
+					+ temp_track.getArtist().getId() + "/related");
+			deezerConnect.requestAsync(request_songs, nextSongRequestHandler);
+			
+		}
+
+	}
+
+	private class NextSongSearchHandler implements RequestListener {
+		public void onComplete(String response, Object requestId) {
+			try {
+
+				ArrayList<Integer> temp_parsed = parseResult(response);
+
+				List<Artist> temp_list = new ListDeezerDataReader<Artist>(
+						Artist.class).readList(response);
+
+				add_nbFans(temp_list, temp_parsed);
+
+				// Sorting by decreasing number of fans
+				Collections.sort(temp_list);
+
+				// Take one of the 5 best
+				Artist temp_artist = temp_list.get((int) (Math.random() * 5));
+
+				DeezerRequest request_top = new DeezerRequest("/artist/"
+						+ temp_artist.getId() + "/top");
+				deezerConnect.requestAsync(request_top, topSongRequestHandler);
+
+			} catch (IllegalStateException e) {
+				Log.e("SongListening / onComplete", "IllegalStateException : "
+						+ e);
+				e.printStackTrace();
+			}// catch
+
+		}
+
+		public void onIOException(IOException e, Object requestId) {
+			Log.w("SongListening / NextSongSearchHandler", "IOException");
+		}
+
+		public void onMalformedURLException(MalformedURLException e,
+				Object requestId) {
+			Log.w("SongListening / NextSongSearchHandler",
+					"onMalformedURLException");
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongListening / NextSongSearchHandler", "onDeezerError : "
+					+ arg0.toString());
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongListening / NextSongSearchHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
+		}
+	}// class
+
+	private class TopSongSearchHandler implements RequestListener {
+		public void onComplete(String response, Object requestId) {
+			try {
+
+				List<Track> temp_trackList = new ListDeezerDataReader<Track>(
+						Track.class).readList(response);
+
+				songListening_track_trackToAdd = temp_trackList.get((int) (Math
+						.random() * 5));
+
+				songListening_list_futureSongs
+						.add(songListening_track_trackToAdd);
+
+				temp_track = songListening_track_trackToAdd;
+
+				Log.i("SongListening / TopSongSearchHandler", "List : "
+						+ songListening_list_futureSongs);
+
+			} catch (IllegalStateException e) {
+				Log.e("SongListening / onComplete", "IllegalStateException : "
+						+ e);
+				e.printStackTrace();
+			}// catch
+
+		}
+
+		public void onIOException(IOException e, Object requestId) {
+			Log.w("SongListening / NextSongSearchHandler", "IOException");
+		}
+
+		public void onMalformedURLException(MalformedURLException e,
+				Object requestId) {
+			Log.w("SongListening / NextSongSearchHandler",
+					"onMalformedURLException");
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongListening / NextSongSearchHandler", "onDeezerError : "
+					+ arg0.toString());
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongListening / NextSongSearchHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
+		}
+	}// class
+
+	public ArrayList<Integer> parseResult(String informations) {
+
+		ArrayList<Integer> res = new ArrayList<Integer>();
+
+		// Log.w("SongListening / parseResult", "informations : "+informations);
+
+		if (informations.contains("total\":0")) {
+			res.add(-1);
+			return res;
+		}
+
+		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
+		// Log.w("SongListening / parseResult", "nb_cases : " +
+		// info_tab.length);
+
+		for (int i = 0; i < info_tab.length; ++i) {
+			String current = info_tab[i];
+			// song
+			int index_nbFans = current.indexOf("nb_fan\":") + 8;
+			int index_radio = current.indexOf(",\"radio");
+			String current_nbFan = current.substring(index_nbFans, index_radio);
+			res.add(Integer.parseInt(current_nbFan));
+
+		}
+
+		// Log.i("SongListening / parseResults", "res :" + res);
 		return res;
+	}
+
+	public void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
+
+		int i = 0;
+		for (Artist a : temp_list) {
+			a.setNbFan(list_fans.get(i));
+			++i;
+		}
+
+	}
+
+	public void tri_ArrayList(List<Integer> list) {
+		Collections.sort(list);
+		Log.w("SongListening / triArrayList", "list triée : " + list);
 	}
 
 	/**

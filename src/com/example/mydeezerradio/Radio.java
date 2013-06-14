@@ -48,4 +48,10 @@ public class Radio implements Thumbnailable {
 	public void setPicture(String picture) {
 		this.picture = picture;
 	}//met
+
+	@Override
+	public int compareTo(Object another) {
+		
+		return 0;
+	}
 }//class

@@ -26,8 +26,9 @@ public class Artist implements Thumbnailable {
 	private String name;
 	/** The url of a thumb icon for the artist. */
 	private String picture;
+	private long nb_fan;
 
-	//@SerializedName("data")
+	// @SerializedName("data")
 	private List<Album> listAlbum = new ArrayList<Album>();
 
 	public long getId() {
@@ -40,6 +41,10 @@ public class Artist implements Thumbnailable {
 
 	public String getName() {
 		return name;
+	}// met
+
+	public long getNbFan() {
+		return nb_fan;
 	}// met
 
 	public void setName(String name) {
@@ -63,6 +68,10 @@ public class Artist implements Thumbnailable {
 		this.listAlbum = listAlbum;
 	}// met
 
+	public void setNbFan(long fans) {
+		this.nb_fan = fans;
+	}// met
+
 	@Override
 	public int hashCode() {
 		int result = (int) (id ^ (id >>> 32));
@@ -73,6 +82,15 @@ public class Artist implements Thumbnailable {
 	public String toString() {
 		return name;
 	}// met
-	
+
+	public int compareTo(Object other) {
+		if (nb_fan > ((Artist) other).getNbFan()) {
+			return -1;
+		} else if (nb_fan < ((Artist) other).getNbFan()) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 
 }// class
