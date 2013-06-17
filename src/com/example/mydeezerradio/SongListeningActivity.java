@@ -53,8 +53,10 @@ public class SongListeningActivity extends Activity {
 	private RequestListener nextSongRequestHandler = new NextSongSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
 	private Track songListening_track_trackToAdd;
-	private Track temp_track;
+	private Track songListening_track_tempTrack;
+	private Artist songListening_artist_tempArtist;
 	private Track songListening_Track_currentTrack;
+//TODO : take care of the case where there is less than 5 artists related
 	private int i = 0;
 	String TAG = "par ou passes tu ?";
 	String TAG2 = "SongListening";
@@ -115,9 +117,8 @@ public class SongListeningActivity extends Activity {
 			Log.e("SongListening / onCreate", "TooManyPlayersExceptions : " + e);
 		}
 
-		songListening_nextSongs(songListening_Track_currentTrack);
-
-		// adapter à faire
+		// songListening_nextSongs(songListening_Track_currentTrack);
+		songListening_nextArtist(songListening_Track_currentTrack.getArtist());
 
 	}
 
@@ -218,30 +219,24 @@ public class SongListeningActivity extends Activity {
 
 	void songListening_nextSongs(Track current_track) {
 
-		temp_track = current_track;
+		songListening_track_tempTrack = current_track;
+		songListening_artist_tempArtist = songListening_track_tempTrack
+				.getArtist();
 
 		for (int j = 0; j < 5; ++j) {
 			// TODO : one asyncTask for the artist then one for the top songs of
 			// each artists
-			// AsyncTask asyncRequestArtist = new AsyncRequestArtist();
-			// asyncRequestArtist.
 			DeezerRequest request_songs = new DeezerRequest("artist/"
-					+ temp_track.getArtist().getId() + "/related");
+					+ songListening_track_tempTrack.getArtist().getId()
+					+ "/related");
 
 			AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(
 					deezerConnect, nextSongRequestHandler);
-			// try {
-			// searchAsyncArtist.get(500, TimeUnit.MILLISECONDS);
-			// } catch (InterruptedException e) {
-			// e.printStackTrace();
-			// } catch (ExecutionException e) {
-			// e.printStackTrace();
-			// } catch (TimeoutException e) {
-			// Log.w("SongListening / nextSongs", "Time Out");
-			// }
 			searchAsyncArtist.execute(request_songs);
-			// deezerConnect.requestAsync(request_songs,
-			// nextSongRequestHandler);
+
+			Log.i("SongListening / nextSongs", "tempArtist : "
+					+ songListening_artist_tempArtist);
+
 		}
 		// Log.i("SongListening / nextSongs",
 		// "list artists : "+songListening_list_futureArtists);
@@ -262,24 +257,23 @@ public class SongListeningActivity extends Activity {
 				Collections.sort(temp_list);
 				// Take one of the 5 best
 				Artist temp_artist = temp_list.get((int) (Math.random() * 5));
-				Log.e(TAG, TAG2 + " sel temp");
-
+			
 				while (containsArtist(songListening_list_futureArtists,
 						temp_artist)) {
+					// not twice the same artist
 					Log.e(TAG, TAG2 + " while");
 					temp_artist = temp_list.get((int) (Math.random() * 5));
 				}
 
 				songListening_list_futureArtists.add(temp_artist);
+				++i;
+				
 				Log.i("SongListening / NextSongSearchHandler",
 						"list artists : " + songListening_list_futureArtists);
-				// TODO : fill the artist list and THEN search for the top
-				// songs.
-				// DeezerRequest request_top = new DeezerRequest("/artist/"
-				// + temp_artist.getId() + "/top");
-				// deezerConnect.requestAsync(request_top,
-				// topSongRequestHandler);
-
+				
+				if (i < 5) {
+					songListening_nextArtist(temp_artist);
+				}
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
 						+ e);
@@ -323,7 +317,7 @@ public class SongListeningActivity extends Activity {
 				songListening_list_futureSongs
 						.add(songListening_track_trackToAdd);
 
-				temp_track = songListening_track_trackToAdd;
+				songListening_track_tempTrack = songListening_track_trackToAdd;
 
 				Log.i("SongListening / TopSongSearchHandler", "List : "
 						+ songListening_list_futureSongs);
@@ -420,6 +414,16 @@ public class SongListeningActivity extends Activity {
 		}
 
 		return false;
+	}
+
+	public void songListening_nextArtist(Artist prev_artist) {
+
+		DeezerRequest request_songs = new DeezerRequest("artist/"
+				+ prev_artist.getId() + "/related");
+		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
+				nextSongRequestHandler);
+		searchAsyncArtist.execute(request_songs);
+
 	}
 
 	/**
