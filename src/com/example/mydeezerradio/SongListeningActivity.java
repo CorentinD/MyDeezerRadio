@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.deezer.sdk.AsyncDeezerTask;
 import com.deezer.sdk.DeezerConnect;
@@ -71,6 +72,7 @@ public class SongListeningActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
 
+		Toast.makeText(getApplicationContext(), "Buffering, please wait",Toast.LENGTH_SHORT);
 		songListening_Track_currentTrack = SongSelectionActivity.trackSelected;
 
 		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
@@ -267,6 +269,9 @@ public class SongListeningActivity extends Activity {
 
 				if (songListening_numberOfTracks_i < 6) {
 					songListening_nextArtist(temp_artist);
+				}
+				else {
+					Toast.makeText(getApplicationContext(), "Buffering done, enjoy !",Toast.LENGTH_SHORT);
 				}
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
