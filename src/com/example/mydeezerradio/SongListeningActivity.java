@@ -41,25 +41,24 @@ import com.deezer.sdk.player.impl.DefaultPlayerFactory;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 
 public class SongListeningActivity extends Activity {
-
+	@SuppressWarnings(value = { "SingleClientConnManager" })
 	private TextView songListening_textView_author;
-	// private SimpleAdapter songListening_adapter_textAuthor;
 	private Player songListening_player_songPlayer;
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
 	private PlayerHandler playerHandler = new PlayerHandler();
 	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
-	List<Track> songListening_list_futureSongs = new ArrayList<Track>();
-	private RequestListener nextSongRequestHandler = new NextSongSearchHandler();
+	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
+	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
 	private Track songListening_track_trackToAdd;
-	private Track songListening_track_tempTrack;
-	private Artist songListening_artist_tempArtist;
 	private Track songListening_Track_currentTrack;
-//TODO : take care of the case where there is less than 5 artists related
-	private int i = 0;
-	String TAG = "par ou passes tu ?";
-	String TAG2 = "SongListening";
+	private int songListening_numberOfTracks_i = 1;
+	private int songListening_trackBeingListened = 0;
+	private boolean songListening_boolean_songSearched = false;
+	private boolean toDo = false;
+	String TAG2 = "par ou passes tu ?";
+	String TAG = "SongListening";
 
 	protected void onPause() {
 		super.onPause();
@@ -118,31 +117,21 @@ public class SongListeningActivity extends Activity {
 		}
 
 		// songListening_nextSongs(songListening_Track_currentTrack);
+		songListening_list_futureSongs.add(songListening_Track_currentTrack);
 		songListening_nextArtist(songListening_Track_currentTrack.getArtist());
 
 	}
 
 	public void songListening_onClick_play(View view) {
-		// player.release();
-
-		Log.i("SongListening / songListening_onClick_play", "Song : "
-				+ songListening_Track_currentTrack);
-		//
-		// if (SongSelectionActivity.trackSelected.hasStream()) {
-		// songListening_player_songPlayer.init(
-		// SongSelectionActivity.trackSelected.getId(),
-		// SongSelectionActivity.trackSelected.getStream());
-		// } else {
-		songListening_player_songPlayer.init(
-				songListening_Track_currentTrack.getId(),
-				songListening_Track_currentTrack.getPreview());
-		// }
-		songListening_player_songPlayer.play();
-
+		play();
 	}
 
 	public void songListening_onClick_pause(View view) {
 		songListening_player_songPlayer.pause();
+	}
+
+	public void songListening_onClick_next(View view) {
+		goTo_nextSong();
 	}
 
 	public void songListening_onClick_return(View view) {
@@ -213,37 +202,34 @@ public class SongListeningActivity extends Activity {
 
 		@Override
 		public void onPlayerProgress(long timePosition) {
+			((TextView) findViewById(R.id.songListening_textView_progression))
+					.setText(timePosition / 30000 + " %");
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
 
-	void songListening_nextSongs(Track current_track) {
+	public void songListening_nextArtist(Artist prev_artist) {
+		DeezerRequest request_artists = new DeezerRequest("artist/"
+				+ prev_artist.getId() + "/related");
+		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
+				nextArtistRequestHandler);
+		searchAsyncArtist.execute(request_artists);
+	}
 
-		songListening_track_tempTrack = current_track;
-		songListening_artist_tempArtist = songListening_track_tempTrack
-				.getArtist();
-
-		for (int j = 0; j < 5; ++j) {
-			// TODO : one asyncTask for the artist then one for the top songs of
-			// each artists
+	void songListening_nextSongs(List<Artist> listArtists) {
+		songListening_list_futureSongs = new ArrayList<Track>();
+		songListening_trackBeingListened = 0;
+		for (Artist a : listArtists) {
 			DeezerRequest request_songs = new DeezerRequest("artist/"
-					+ songListening_track_tempTrack.getArtist().getId()
-					+ "/related");
-
+					+ a.getId() + "/top");
 			AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(
-					deezerConnect, nextSongRequestHandler);
+					deezerConnect, topSongRequestHandler);
 			searchAsyncArtist.execute(request_songs);
-
-			Log.i("SongListening / nextSongs", "tempArtist : "
-					+ songListening_artist_tempArtist);
-
 		}
-		// Log.i("SongListening / nextSongs",
-		// "list artists : "+songListening_list_futureArtists);
-		i = 5;
+		songListening_boolean_songSearched = true;
 	} // songListening_nextSongs
 
-	private class NextSongSearchHandler implements RequestListener {
+	private class NextArtistSearchHandler implements RequestListener {
 		@SuppressWarnings("unchecked")
 		public void onComplete(String response, Object requestId) {
 			try {
@@ -251,27 +237,32 @@ public class SongListeningActivity extends Activity {
 				List<Artist> temp_list = new ListDeezerDataReader<Artist>(
 						Artist.class).readList(response);
 
+				// if there's less than 5 related artists, new random :
+				int random_number = 5;
+				if (temp_list.size() < 5) {
+					random_number = temp_list.size();
+				}
 				// adding informations to the artist for the sorting
 				add_nbFans(temp_list, temp_parsed);
 				// Sorting by decreasing number of fans
 				Collections.sort(temp_list);
 				// Take one of the 5 best
-				Artist temp_artist = temp_list.get((int) (Math.random() * 5));
-			
+				Artist temp_artist = temp_list
+						.get((int) (Math.random() * random_number));
+
 				while (containsArtist(songListening_list_futureArtists,
 						temp_artist)) {
 					// not twice the same artist
-					Log.e(TAG, TAG2 + " while");
 					temp_artist = temp_list.get((int) (Math.random() * 5));
 				}
 
 				songListening_list_futureArtists.add(temp_artist);
-				++i;
-				
+				++songListening_numberOfTracks_i;
+
 				Log.i("SongListening / NextSongSearchHandler",
 						"list artists : " + songListening_list_futureArtists);
-				
-				if (i < 5) {
+
+				if (songListening_numberOfTracks_i < 6) {
 					songListening_nextArtist(temp_artist);
 				}
 			} catch (IllegalStateException e) {
@@ -317,8 +308,6 @@ public class SongListeningActivity extends Activity {
 				songListening_list_futureSongs
 						.add(songListening_track_trackToAdd);
 
-				songListening_track_tempTrack = songListening_track_trackToAdd;
-
 				Log.i("SongListening / TopSongSearchHandler", "List : "
 						+ songListening_list_futureSongs);
 
@@ -354,10 +343,7 @@ public class SongListeningActivity extends Activity {
 	}// class
 
 	public ArrayList<Integer> parseResult(String informations) {
-
 		ArrayList<Integer> res = new ArrayList<Integer>();
-
-		// Log.w("SongListening / parseResult", "informations : "+informations);
 
 		if (informations.contains("total\":0")) {
 			res.add(-1);
@@ -365,8 +351,6 @@ public class SongListeningActivity extends Activity {
 		}
 
 		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
-		// Log.w("SongListening / parseResult", "nb_cases : " +
-		// info_tab.length);
 
 		for (int i = 0; i < info_tab.length; ++i) {
 			String current = info_tab[i];
@@ -377,10 +361,8 @@ public class SongListeningActivity extends Activity {
 			res.add(Integer.parseInt(current_nbFan));
 
 		}
-
-		// Log.i("SongListening / parseResults", "res :" + res);
 		return res;
-	}
+	} // parseResult
 
 	public void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
 
@@ -389,12 +371,10 @@ public class SongListeningActivity extends Activity {
 			a.setNbFan(list_fans.get(i));
 			++i;
 		}
-
-	}
+	} // add_nbFans
 
 	public void tri_ArrayList(List<Integer> list) {
 		Collections.sort(list);
-		// Log.w("SongListening / triArrayList", "list triée : " + list);
 	}
 
 	public boolean containsArtist(List<Artist> listT, Artist art) {
@@ -416,14 +396,54 @@ public class SongListeningActivity extends Activity {
 		return false;
 	}
 
-	public void songListening_nextArtist(Artist prev_artist) {
+	public void goTo_nextSong() {
 
-		DeezerRequest request_songs = new DeezerRequest("artist/"
-				+ prev_artist.getId() + "/related");
-		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
-				nextSongRequestHandler);
-		searchAsyncArtist.execute(request_songs);
+		if (songListening_boolean_songSearched) {
 
+			songListening_Track_currentTrack = songListening_list_futureSongs
+					.get(songListening_trackBeingListened);
+			++songListening_trackBeingListened;
+			--songListening_numberOfTracks_i;
+			songListening_player_songPlayer.stop();
+			songListening_textView_author
+					.setText(songListening_Track_currentTrack.toString());
+			play();
+
+			if (toDo) {
+				Log.i("SongListening / goTo_NextSong", "toDo : " + toDo);
+				songListening_nextSongs(songListening_list_futureArtists);
+				toDo = false;
+			}
+			if (songListening_numberOfTracks_i == 2) {
+				songListening_list_futureArtists = new ArrayList<Artist>();
+				songListening_nextArtist(songListening_Track_currentTrack
+						.getArtist());
+				toDo = true;
+			}
+
+		}
+
+	}// goTo_nextSong
+
+	public void play() {
+
+		Log.i("SongListening / songListening_onClick_play", "Song : "
+				+ songListening_Track_currentTrack);
+		//
+		// if (SongSelectionActivity.trackSelected.hasStream()) {
+		// songListening_player_songPlayer.init(
+		// SongSelectionActivity.trackSelected.getId(),
+		// SongSelectionActivity.trackSelected.getStream());
+		// } else {
+		songListening_player_songPlayer.init(
+				songListening_Track_currentTrack.getId(),
+				songListening_Track_currentTrack.getPreview());
+		// }
+		songListening_player_songPlayer.play();
+
+		if (!songListening_boolean_songSearched) {
+			songListening_nextSongs(songListening_list_futureArtists);
+		}
 	}
 
 	/**
