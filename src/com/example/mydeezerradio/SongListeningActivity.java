@@ -191,6 +191,9 @@ public class SongListeningActivity extends Activity {
 
 		@Override
 		public void onPlayerStateChange(PlayerState state, long timePosition) {
+			if(state.compareTo(PlayerState.PLAYBACK_COMPLETED)==0){
+				goTo_nextSong();
+			}
 			sendMessageShowPlayerState(state);
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
@@ -203,7 +206,7 @@ public class SongListeningActivity extends Activity {
 		@Override
 		public void onPlayerProgress(long timePosition) {
 			((TextView) findViewById(R.id.songListening_textView_progression))
-					.setText(timePosition / 30000 + " %");
+					.setText(timePosition / 300 + " %");
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
