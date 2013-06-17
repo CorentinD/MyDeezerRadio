@@ -19,31 +19,40 @@
         android:contentDescription="@string/songListening_imageView_cover_description"
         android:src="@drawable/deezer_cover_default" />
 
-    <TextView 
-        android:textStyle="italic"
-        android:textSize="@dimen/activity_horizontal_margin"
+    <TextView
         android:id="@+id/songListening_textView_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="13"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/songListening_imageView_cover"
+        android:layout_centerHorizontal="true"
+        android:ems="13"
         android:overScrollMode="ifContentScrolls"
-        />
-   
+        android:textSize="@dimen/activity_horizontal_margin"
+        android:textStyle="italic" />
 
     <ImageButton
         android:id="@+id/songListening_button_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/songListening_textView_author"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
         android:contentDescription="@string/songListening_imageButton_play_description"
         android:onClick="songListening_onClick_play"
         android:src="@drawable/deezer_button_play" />
-    
-     <Button
+
+    <ImageButton
+        android:id="@+id/songListening_button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/songListening_textView_author"
+        android:layout_toLeftOf="@+id/songListening_button_play"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/songListening_imageButton_pause_description"
+        android:onClick="songListening_onClick_pause"
+        android:src="@drawable/deezer_button_pause" />
+
+    <Button
         android:id="@+id/songListening_button_return"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

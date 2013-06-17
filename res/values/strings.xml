@@ -20,5 +20,6 @@
     <string name="songListening_button_return">Retour</string>
     <string name="songListening_imageView_cover_description">Image de couverture</string>
     <string name="songListening_imageButton_play_description">PLAY</string>
+    <string name="songListening_imageButton_pause_description">PAUSE</string>
 
 </resources>

@@ -40,10 +40,10 @@ public class SongInputActivity extends Activity {
 		setContentView(R.layout.activity_song_input);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
+
 		SessionStore sessionStore = new SessionStore();
 		sessionStore.restore(deezerConnect, this);
-		
+
 		listTracks = null;
 	}
 
@@ -68,29 +68,24 @@ public class SongInputActivity extends Activity {
 	}
 
 	private void TrackSearchComplete(List<Track> listReceived) {
-		Log.w("SongInput / TrackSearchComplete","done");
+		Log.w("SongInput / TrackSearchComplete", "done");
 	}
-	
+
 	private class SongInputRequestHandler implements RequestListener {
 		public void onComplete(String response, Object requestId) {
 			try {
-//				Log.w("SongInput / onComplete", "receive json : "
-//						+ response);
 				listTracks = new ListDeezerDataReader<Track>(Track.class)
 						.readList(response);
 				Log.w("SongInput / onComplete", "received Track list : "
 						+ listTracks);
 				TrackSearchComplete(listTracks);
 			} catch (IllegalStateException e) {
-				Log.e("SongInput / onComplete", "IllegalStateException : "
-						+ e);
+				Log.e("SongInput / onComplete", "IllegalStateException : " + e);
 				e.printStackTrace();
 			}// catch
 
 			Intent intent = new Intent(getApplicationContext(),
 					SongSelectionActivity.class);
-			// intent.putExtra(EXTRA_SONGINPUT_SEARCH, response);
-
 			startActivity(intent);
 		}
 
