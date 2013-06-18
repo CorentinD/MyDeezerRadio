@@ -26,6 +26,16 @@ public class User implements Thumbnailable {
 	private String birthday;
 	/** The picture url of the user. */
 	private String picture;
+	/** The id of the user. */
+	private int id;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public String getLastname() {
 		return lastname;

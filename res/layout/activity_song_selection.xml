@@ -13,8 +13,6 @@
         android:id="@+id/songSelection_listView_songList"
         android:layout_width="match_parent"
         android:layout_height="300dp" >
-        
-        
     </ListView>
 
     <Button

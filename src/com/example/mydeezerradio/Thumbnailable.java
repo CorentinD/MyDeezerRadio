@@ -7,6 +7,7 @@ package com.example.mydeezerradio;
  * 
  * @author Deezer
  */
+@SuppressWarnings("rawtypes")
 public interface Thumbnailable extends Comparable{
 
 	/** @return the http url of the thumbnail associated to this data. */

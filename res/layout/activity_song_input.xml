@@ -28,6 +28,16 @@
         android:layout_centerHorizontal="true"
         android:onClick="songInput_onClick_search"
         android:text="@string/songInput_button_search" />
+    
+    <Button
+        android:id="@+id/songInput_button_goToFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/songInput_button_search"
+        android:layout_centerHorizontal="true"
+        android:onClick="songInput_onClick_goToFavorite"
+        android:text="@string/songInput_button_goToFavorite"
+        />
 
     <Button
         android:id="@+id/songInput_button_return"

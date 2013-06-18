@@ -3,7 +3,6 @@ package com.example.mydeezerradio;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +31,7 @@ public class MainActivity extends Activity {
 
 	public final static String TAG = "com.example.mydeezerradio.Mainactivity";
 	final String defValue = "erreur recuperation données";
-	String userId = new String();
+	public static int userId = 0;
 	public final static String name_sharedPref = "com.example.mydeezerradio";
 	SharedPreferences sharedPref;
 	SharedPreferences.Editor sharedPref_editor;
@@ -44,17 +43,15 @@ public class MainActivity extends Activity {
 	/** Your app Deezer appId. */
 	public final static String APP_ID = "119355";
 	/** Permissions requested on Deezer accounts. */
-	private final static String[] PERMISSIONS = new String[] {
-			Manifest.permission.ACCESS_NETWORK_STATE,
-			Manifest.permission.INTERNET, Manifest.permission.WAKE_LOCK,
-			Manifest.permission.READ_PHONE_STATE,
-			Manifest.permission.WRITE_EXTERNAL_STORAGE };
+	private final static String[] PERMISSIONS = new String[] { "basic_access",
+			"offline_access" };
 	/** DeezerConnect object used for authentification or request. */
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(APP_ID);
 
 	/** DeezerRequestListener object used to handle requests. */
 	private RequestListener userRequestListenerHandler = new UserRequestHandler();
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -90,31 +87,20 @@ public class MainActivity extends Activity {
 
 	public void mainV2_onClick_connect(View view) {
 		// Attempt to connect
-		
-		if (deezerConnect==null) {
-			deezerConnect = new DeezerConnectImpl(APP_ID);
-			SessionStore sessionStore = new SessionStore();
-			sessionStore.restore(deezerConnect, this);
-		}
-		
 		deezerConnect.authorize(MainActivity.this, PERMISSIONS,
 				new LoginDialogHandler());
-
 	}
 
 	public void mainV2_onClick_disconnect(View view) {
 
-		SessionStore sess = new SessionStore();
-		sess.clear(getApplicationContext());
+		new SessionStore().clear(this);
 		
-		//deezerConnect.logout(MainActivity.this);
-		deezerConnect = null;		
+		deezerConnect.logout(MainActivity.this);
 		isConnected = false;
 		access_token = null;
 		user_data = new User();
 
-		Toast.makeText(getApplicationContext(), "disconnected",
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "disconnected", Toast.LENGTH_SHORT).show();
 		((TextView) findViewById(R.id.mainV2_textView_nameUser))
 				.setText("Déconnecté");
 
@@ -178,6 +164,7 @@ public class MainActivity extends Activity {
 		sharedPref_editor.putString(sharedPref_string_userName,
 				user.getFirstname());
 		sharedPref_editor.commit();
+		user_data = user;
 		Log.i("MainActivity / searchUserFinish", "user request : " + user);
 	}
 
@@ -185,9 +172,11 @@ public class MainActivity extends Activity {
 		@Override
 		public void onComplete(String response, Object arg1) {
 			try {
+				userId = Integer.parseInt(getId(response));
 				User user = new DeezerDataReader<User>(User.class)
 						.read(response);
 				Log.i("MainActivity / onComplete", "user request : " + user);
+				Log.i("MainActivity / onComplete", "user ID : " + userId);
 				searchUserFinish(user);
 			} catch (IllegalStateException e) {
 				handleError(e);
@@ -224,6 +213,12 @@ public class MainActivity extends Activity {
 
 	public void handleError(Object e) {
 		Log.e("MainActivity / Error :", e.toString());
+	}
+
+	public String getId(String data) {
+		int index_id = data.indexOf("id\":") + 5;
+		int index_name = data.indexOf(",\"name")-1;
+		return data.substring(index_id, index_name);
 	}
 
 	@Override

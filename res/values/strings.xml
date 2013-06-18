@@ -14,6 +14,7 @@
     <string name="songInput_editText_song">Chanson de départ ?</string>
     <string name="songInput_button_search">Recherche</string>
     <string name="songInput_button_return">Retour</string>
+    <string name="songInput_button_goToFavorite">Favoris</string>
     <string name="title_activity_song_selection">SongSelection</string>
     <string name="songSelection_button_return">Retour</string>
     <string name="title_activity_song_listening">SongListeningActivity</string>
@@ -22,6 +23,8 @@
     <string name="songListening_imageButton_play_description">PLAY</string>
     <string name="songListening_imageButton_pause_description">PAUSE</string>
     <string name="songListening_imageButton_next_description">NEXT</string>
-    <string name ="songListening_textView_progression">0 %</string>
+    <string name="songListening_textView_progression">0 %</string>
+    <string name="title_activity_favorite_songs">FavoriteSongsActivity</string>
+    <string name="favoriteSongs_button_return">Retour</string>
 
 </resources>

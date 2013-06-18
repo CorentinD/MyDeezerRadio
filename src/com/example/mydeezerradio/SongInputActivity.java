@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.deezer.sdk.AsyncDeezerTask;
 import com.deezer.sdk.DeezerConnect;
 import com.deezer.sdk.DeezerConnectImpl;
 import com.deezer.sdk.DeezerError;
@@ -31,7 +32,7 @@ public class SongInputActivity extends Activity {
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
 	/** DeezerRequestListener object used to handle requests. */
-	RequestListener requestHandler = new SongInputRequestHandler();
+	RequestListener songInputRequestHandler = new SongInputRequestHandler();
 	public static List<Track> listTracks;
 
 	@Override
@@ -42,7 +43,9 @@ public class SongInputActivity extends Activity {
 		setupActionBar();
 
 		SessionStore sessionStore = new SessionStore();
-		sessionStore.restore(deezerConnect, this);
+		Log.i("SongInput / onCreate",
+				"restore : " + sessionStore.restore(deezerConnect, this));
+		Log.i("SongInput / onCreate", "user : " + MainActivity.user_data);
 
 		listTracks = null;
 	}
@@ -63,11 +66,23 @@ public class SongInputActivity extends Activity {
 			bundle.putString("q", song);
 			bundle.putString("nb_items", "20");
 			DeezerRequest request_songs = new DeezerRequest("search/", bundle);
-			deezerConnect.requestAsync(request_songs, requestHandler);
+			AsyncDeezerTask searchAsyncTracks = new AsyncDeezerTask(
+					deezerConnect, songInputRequestHandler);
+			searchAsyncTracks.execute(request_songs);
 		}
+	} // songInput_onClick_search
+
+	public void songInput_onClick_goToFavorite(View view) {
+		AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(deezerConnect,
+				songInputRequestHandler);
+		Log.i("user id", ""+MainActivity.userId);
+		Log.d("user id 2 : " , ""+MainActivity.user_data.getId());
+		DeezerRequest request_favorite = new DeezerRequest("/user/"
+				+ MainActivity.userId + "/tracks");
+		searchAsyncFav.execute(request_favorite);
 	}
 
-	private void TrackSearchComplete(List<Track> listReceived) {
+	private void TrackSearchComplete() {
 		Log.w("SongInput / TrackSearchComplete", "done");
 	}
 
@@ -78,7 +93,7 @@ public class SongInputActivity extends Activity {
 						.readList(response);
 				Log.w("SongInput / onComplete", "received Track list : "
 						+ listTracks);
-				TrackSearchComplete(listTracks);
+				TrackSearchComplete();
 			} catch (IllegalStateException e) {
 				Log.e("SongInput / onComplete", "IllegalStateException : " + e);
 				e.printStackTrace();
@@ -90,25 +105,27 @@ public class SongInputActivity extends Activity {
 		}
 
 		public void onIOException(IOException e, Object requestId) {
-			Log.w("Main / requestHandler", "IOException");
+			Log.w("SongInputActivity / requestHandler", "IOException");
 		}
 
 		public void onMalformedURLException(MalformedURLException e,
 				Object requestId) {
-			Log.w("Main / requestHandler", "onMalformedURLException");
+			Log.w("SongInputActivity / requestHandler",
+					"onMalformedURLException");
 		}
 
 		@Override
 		public void onDeezerError(DeezerError arg0, Object arg1) {
-			Log.w("Main / requestHandler", "onDeezerError : " + arg0.toString());
+			Log.w("SongInputActivity / requestHandler", "onDeezerError : "
+					+ arg0.toString());
 		}
 
 		@Override
 		public void onOAuthException(OAuthException arg0, Object arg1) {
-			Log.w("Main / requestHandler", "onOAuthException" + arg0 + " / "
-					+ arg1);
+			Log.w("SongInputActivity / requestHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
 		}
-	}// class
+	}// class SongInputRequestHandler
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.

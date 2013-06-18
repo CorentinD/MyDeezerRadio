@@ -42,22 +42,27 @@ import com.deezer.sdk.player.impl.DefaultPlayerFactory;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 
 public class SongListeningActivity extends Activity {
-	@SuppressWarnings(value = { "SingleClientConnManager" })
 	private TextView songListening_textView_author;
-	private Player songListening_player_songPlayer;
+
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
+
+	private Player songListening_player_songPlayer;
 	private PlayerHandler playerHandler = new PlayerHandler();
-	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
-	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
 	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
+
+	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
+	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
 	private Track songListening_track_trackToAdd;
 	private Track songListening_Track_currentTrack;
+
 	private int songListening_numberOfTracks_i = 1;
 	private int songListening_trackBeingListened = 0;
+
 	private boolean songListening_boolean_songSearched = false;
 	private boolean toDo = false;
+
 	String TAG2 = "par ou passes tu ?";
 	String TAG = "SongListening";
 
@@ -72,7 +77,8 @@ public class SongListeningActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
 
-		Toast.makeText(getApplicationContext(), "Buffering, please wait",Toast.LENGTH_SHORT);
+		Toast.makeText(this, "Buffering, please wait",
+				Toast.LENGTH_SHORT).show();
 		songListening_Track_currentTrack = SongSelectionActivity.trackSelected;
 
 		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
@@ -80,8 +86,6 @@ public class SongListeningActivity extends Activity {
 		songListening_textView_author.setText(songListening_Track_currentTrack
 				.toString());
 
-		// deezerConnect.setAccessToken(getApplicationContext(),
-		// MainActivity.access_token);
 		SessionStore sessionStore = new SessionStore();
 		sessionStore.restore(deezerConnect, this);
 
@@ -193,7 +197,7 @@ public class SongListeningActivity extends Activity {
 
 		@Override
 		public void onPlayerStateChange(PlayerState state, long timePosition) {
-			if(state.compareTo(PlayerState.PLAYBACK_COMPLETED)==0){
+			if (state.compareTo(PlayerState.PLAYBACK_COMPLETED) == 0) {
 				goTo_nextSong();
 			}
 			sendMessageShowPlayerState(state);
@@ -269,9 +273,10 @@ public class SongListeningActivity extends Activity {
 
 				if (songListening_numberOfTracks_i < 6) {
 					songListening_nextArtist(temp_artist);
-				}
-				else {
-					Toast.makeText(getApplicationContext(), "Buffering done, enjoy !",Toast.LENGTH_SHORT);
+				} else {
+					Toast.makeText(getApplicationContext(),
+							"Buffering done, enjoy !", Toast.LENGTH_SHORT)
+							.show();
 				}
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
