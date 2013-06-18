@@ -1,7 +1,10 @@
 package com.example.mydeezerradio;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -10,6 +13,7 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -17,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,8 +82,8 @@ public class SongListeningActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
 
-		Toast.makeText(this, "Buffering, please wait",
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Buffering, please wait", Toast.LENGTH_SHORT)
+				.show();
 		songListening_Track_currentTrack = SongSelectionActivity.trackSelected;
 
 		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
@@ -452,8 +457,24 @@ public class SongListeningActivity extends Activity {
 				songListening_Track_currentTrack.getId(),
 				songListening_Track_currentTrack.getPreview());
 		// }
+		
 		songListening_player_songPlayer.play();
+		
+//		Log.i("SongListening / play", "url : "
+//				+ songListening_Track_currentTrack.getAlbum().getCover());
+	
 
+		try {
+			URL url = new URL("http://cdn-images.deezer.com/images/cover/d36c87b180453d9b720c65c3e61478c7/120x120-000000-80-0-0.jpg");
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+			InputStream input = connection.getInputStream();
+			((ImageView) findViewById(R.id.songListening_imageView_cover))
+					.setImageBitmap(BitmapFactory.decodeStream(input));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (!songListening_boolean_songSearched) {
 			songListening_nextSongs(songListening_list_futureArtists);
 		}

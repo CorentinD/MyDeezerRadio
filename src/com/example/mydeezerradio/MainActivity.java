@@ -134,6 +134,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onDeezerError(final DeezerError deezerError) {
 			Log.w("Main / onDeezerError", "ERROR");
+			
 		}// met
 
 		@Override

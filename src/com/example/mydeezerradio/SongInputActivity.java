@@ -75,8 +75,6 @@ public class SongInputActivity extends Activity {
 	public void songInput_onClick_goToFavorite(View view) {
 		AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(deezerConnect,
 				songInputRequestHandler);
-		Log.i("user id", ""+MainActivity.userId);
-		Log.d("user id 2 : " , ""+MainActivity.user_data.getId());
 		DeezerRequest request_favorite = new DeezerRequest("/user/"
 				+ MainActivity.userId + "/tracks");
 		searchAsyncFav.execute(request_favorite);

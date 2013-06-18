@@ -27,6 +27,17 @@ public class Track {
 	private String preview;
 	/** The author of the track. */
 	private Artist artist;
+	/** The album of the track. */
+	private Album album;
+	
+
+	public Album getAlbum() {
+		return album;
+	}
+
+	public void setAlbum(Album album) {
+		this.album = album;
+	}
 
 	public long getId() {
 		return id;
