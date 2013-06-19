@@ -29,7 +29,6 @@ public class Track {
 	private Artist artist;
 	/** The album of the track. */
 	private Album album;
-	
 
 	public Album getAlbum() {
 		return album;
@@ -85,7 +84,7 @@ public class Track {
 	}// met
 
 	public boolean hasStream() {
-		return stream != "false";
+		return (stream != "false") && (stream != null);
 	}// met
 
 	public String getPreview() {

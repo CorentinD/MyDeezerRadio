@@ -10,18 +10,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.os.StrictMode;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -127,9 +124,14 @@ public class SongListeningActivity extends Activity {
 			Log.e("SongListening / onCreate", "TooManyPlayersExceptions : " + e);
 		}
 
-		// songListening_nextSongs(songListening_Track_currentTrack);
 		songListening_list_futureSongs.add(songListening_Track_currentTrack);
 		songListening_nextArtist(songListening_Track_currentTrack.getArtist());
+
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
 
 	}
 
@@ -221,8 +223,6 @@ public class SongListeningActivity extends Activity {
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
-	
-
 
 	public void songListening_nextArtist(Artist prev_artist) {
 		DeezerRequest request_artists = new DeezerRequest("artist/"
@@ -447,32 +447,36 @@ public class SongListeningActivity extends Activity {
 
 	public void play() {
 
-		Log.i("SongListening / songListening_onClick_play", "Song : "
+		Log.i("SongListening / play", "Song : "
 				+ songListening_Track_currentTrack);
-		//
-		// if (SongSelectionActivity.trackSelected.hasStream()) {
-		// songListening_player_songPlayer.init(
-		// SongSelectionActivity.trackSelected.getId(),
-		// SongSelectionActivity.trackSelected.getStream());
-		// } else {
-		songListening_player_songPlayer.init(
-				songListening_Track_currentTrack.getId(),
-				songListening_Track_currentTrack.getPreview());
-		// }
-		
+
+		Log.i("SongListening / play ", "stream() : "
+				+ songListening_Track_currentTrack.getStream());
+
+		// TODO : si vient des fav : stream==false / si recherche stream==null
+
+		if (songListening_Track_currentTrack.hasStream()) {
+			songListening_player_songPlayer.init(
+					songListening_Track_currentTrack.getId(),
+					songListening_Track_currentTrack.getStream());
+		} else {
+			songListening_player_songPlayer.init(
+					songListening_Track_currentTrack.getId(),
+					songListening_Track_currentTrack.getPreview());
+		}
+
 		songListening_player_songPlayer.play();
-		
-//		Log.i("SongListening / play", "url : "
-//				+ songListening_Track_currentTrack.getAlbum().getCover());
-	
 
 		try {
-			URL url = new URL("http://cdn-images.deezer.com/images/cover/d36c87b180453d9b720c65c3e61478c7/120x120-000000-80-0-0.jpg");
+			URL url = new URL(songListening_Track_currentTrack.getAlbum()
+					.getCover());
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			InputStream input = connection.getInputStream();
 			((ImageView) findViewById(R.id.songListening_imageView_cover))
 					.setImageBitmap(BitmapFactory.decodeStream(input));
+			((ImageView) findViewById(R.id.songListening_imageView_cover))
+					.setScaleType(ScaleType.FIT_XY);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -482,38 +486,4 @@ public class SongListeningActivity extends Activity {
 		}
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.song_listening, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-}
+} // songListeningActivity
