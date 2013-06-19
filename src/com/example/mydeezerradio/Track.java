@@ -103,4 +103,8 @@ public class Track {
 		this.artist = artist;
 	}// met
 
+	public int compareTo(Object o) {
+		return (int) (this.id - ((Track) o).id);
+	}
+
 }// class

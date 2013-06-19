@@ -25,14 +25,16 @@ public final class R {
         public static final int deezer_background_songlistening=0x7f020001;
         public static final int deezer_background_songselection=0x7f020002;
         public static final int deezer_blank=0x7f020003;
-        public static final int deezer_button_next=0x7f020004;
-        public static final int deezer_button_pause=0x7f020005;
-        public static final int deezer_button_play=0x7f020006;
-        public static final int deezer_cover_default=0x7f020007;
-        public static final int ic_launcher=0x7f020008;
+        public static final int deezer_button_fav_no=0x7f020004;
+        public static final int deezer_button_fav_yes=0x7f020005;
+        public static final int deezer_button_next=0x7f020006;
+        public static final int deezer_button_pause=0x7f020007;
+        public static final int deezer_button_play=0x7f020008;
+        public static final int deezer_cover_default=0x7f020009;
+        public static final int ic_launcher=0x7f02000a;
     }
     public static final class id {
-        public static final int action_settings=0x7f080010;
+        public static final int action_settings=0x7f080011;
         public static final int mainV2_button_connect=0x7f080001;
         public static final int mainV2_button_disconnect=0x7f080002;
         public static final int mainV2_textView_nameUser=0x7f080000;
@@ -40,15 +42,16 @@ public final class R {
         public static final int songInput_button_return=0x7f080006;
         public static final int songInput_button_search=0x7f080004;
         public static final int songInput_editText_song=0x7f080003;
+        public static final int songListening_button_fav=0x7f08000d;
         public static final int songListening_button_next=0x7f08000a;
         public static final int songListening_button_pause=0x7f08000c;
         public static final int songListening_button_play=0x7f08000b;
-        public static final int songListening_button_return=0x7f08000d;
+        public static final int songListening_button_return=0x7f08000e;
         public static final int songListening_imageView_cover=0x7f080007;
         public static final int songListening_textView_author=0x7f080008;
         public static final int songListening_textView_progression=0x7f080009;
-        public static final int songSelection_button_return=0x7f08000f;
-        public static final int songSelection_listView_songList=0x7f08000e;
+        public static final int songSelection_button_return=0x7f080010;
+        public static final int songSelection_listView_songList=0x7f08000f;
     }
     public static final class layout {
         public static final int activity_main_v2=0x7f030000;
@@ -66,7 +69,6 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f050002;
         public static final int app_name=0x7f050001;
-        public static final int favoriteSongs_button_return=0x7f050018;
         public static final int hello_world=0x7f050000;
         public static final int mainV2_button_connect=0x7f050007;
         public static final int mainV2_button_disconnect=0x7f050008;
@@ -79,13 +81,13 @@ public final class R {
         public static final int songInput_button_search=0x7f05000b;
         public static final int songInput_editText_song=0x7f05000a;
         public static final int songListening_button_return=0x7f050011;
+        public static final int songListening_imageButton_fav_description=0x7f050017;
         public static final int songListening_imageButton_next_description=0x7f050015;
         public static final int songListening_imageButton_pause_description=0x7f050014;
         public static final int songListening_imageButton_play_description=0x7f050013;
         public static final int songListening_imageView_cover_description=0x7f050012;
         public static final int songListening_textView_progression=0x7f050016;
         public static final int songSelection_button_return=0x7f05000f;
-        public static final int title_activity_favorite_songs=0x7f050017;
         public static final int title_activity_song_input=0x7f050009;
         public static final int title_activity_song_listening=0x7f050010;
         public static final int title_activity_song_selection=0x7f05000e;

@@ -44,14 +44,13 @@ public class MainActivity extends Activity {
 	public final static String APP_ID = "119355";
 	/** Permissions requested on Deezer accounts. */
 	private final static String[] PERMISSIONS = new String[] { "basic_access",
-			"offline_access" };
+			"offline_access", "manage_library" };
 	/** DeezerConnect object used for authentification or request. */
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(APP_ID);
 
 	/** DeezerRequestListener object used to handle requests. */
 	private RequestListener userRequestListenerHandler = new UserRequestHandler();
 
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,7 +93,7 @@ public class MainActivity extends Activity {
 	public void mainV2_onClick_disconnect(View view) {
 
 		new SessionStore().clear(this);
-		
+
 		deezerConnect.logout(MainActivity.this);
 		isConnected = false;
 		access_token = null;
@@ -128,13 +127,13 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onDeezerError(final DeezerError deezerError) {
-			Log.w("Main / onDeezerError", "ERROR");
-			
+			Log.w("Main / onDeezerError", deezerError);
+
 		}// met
 
 		@Override
 		public void onError(final DialogError dialogError) {
-			Log.w("Main / onError", "ERROR");
+			Log.w("Main / onError", dialogError);
 		}// met
 
 		@Override
@@ -144,7 +143,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onOAuthException(OAuthException oAuthException) {
-			Log.w("Main / onOAuthException", "ERROR");
+			Log.w("Main / onOAuthException",  oAuthException);
 		}// met
 	}// inner class
 
@@ -217,7 +216,7 @@ public class MainActivity extends Activity {
 
 	public String getId(String data) {
 		int index_id = data.indexOf("id\":") + 5;
-		int index_name = data.indexOf(",\"name")-1;
+		int index_name = data.indexOf(",\"name") - 1;
 		return data.substring(index_id, index_name);
 	}
 

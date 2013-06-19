@@ -57,14 +57,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mydeezerradio.SongSelection" />
         </activity>
-        <activity
-            android:name="com.example.mydeezerradio.FavoriteSongsActivity"
-            android:label="@string/title_activity_favorite_songs"
-            android:parentActivityName="com.example.mydeezerradio.SongInputActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.mydeezerradio.SongInputActivity" />
-        </activity>
     </application>
 
 </manifest>

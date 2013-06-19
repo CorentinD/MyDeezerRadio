@@ -24,7 +24,6 @@
     <string name="songListening_imageButton_pause_description">PAUSE</string>
     <string name="songListening_imageButton_next_description">NEXT</string>
     <string name="songListening_textView_progression">0 %</string>
-    <string name="title_activity_favorite_songs">FavoriteSongsActivity</string>
-    <string name="favoriteSongs_button_return">Retour</string>
+    <string name="songListening_imageButton_fav_description">Favorite</string>
 
 </resources>

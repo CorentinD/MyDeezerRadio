@@ -53,11 +53,13 @@ public class SongListeningActivity extends Activity {
 	private PlayerHandler playerHandler = new PlayerHandler();
 	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
+	private RequestListener addFavHandler = new AddFavHandler();
 
 	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
 	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
 	private Track songListening_track_trackToAdd;
 	private Track songListening_Track_currentTrack;
+	boolean currentTrack_isFav = false;
 
 	private int songListening_numberOfTracks_i = 1;
 	private int songListening_trackBeingListened = 0;
@@ -150,6 +152,14 @@ public class SongListeningActivity extends Activity {
 	public void songListening_onClick_return(View view) {
 		Intent intent = new Intent(this, SongInputActivity.class);
 		startActivity(intent);
+	}
+
+	public void songListening_onClick_fav(View view) {
+		if (!currentTrack_isFav) {
+			addCurrentToFav();
+		} else {
+			removeCurrentFromFav();
+		}
 	}
 
 	private void sendMessageShowPlayerProgress(long timePosition) {
@@ -322,8 +332,13 @@ public class SongListeningActivity extends Activity {
 				List<Track> temp_trackList = new ListDeezerDataReader<Track>(
 						Track.class).readList(response);
 
+				int random_number = 5;
+				if (temp_trackList.size() < 5) {
+					random_number = temp_trackList.size();
+				}
+
 				songListening_track_trackToAdd = temp_trackList.get((int) (Math
-						.random() * 5));
+						.random() * random_number));
 
 				songListening_list_futureSongs
 						.add(songListening_track_trackToAdd);
@@ -414,7 +429,7 @@ public class SongListeningActivity extends Activity {
 		}
 
 		return false;
-	}
+	} // containsArtist
 
 	public void goTo_nextSong() {
 
@@ -465,8 +480,27 @@ public class SongListeningActivity extends Activity {
 					songListening_Track_currentTrack.getPreview());
 		}
 
+		currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
+				.contains(songListening_Track_currentTrack);
+		if (currentTrack_isFav) {
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_yes);
+		} else {
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_no);
+		}
+
 		songListening_player_songPlayer.play();
 
+		Log.i("SongListening / play", "cover set : " + songListening_setImage());
+
+		if (!songListening_boolean_songSearched) {
+			songListening_nextSongs(songListening_list_futureArtists);
+		}
+	} // play
+
+	public boolean songListening_setImage() {
+		boolean rep = false;
 		try {
 			URL url = new URL(songListening_Track_currentTrack.getAlbum()
 					.getCover());
@@ -477,13 +511,67 @@ public class SongListeningActivity extends Activity {
 					.setImageBitmap(BitmapFactory.decodeStream(input));
 			((ImageView) findViewById(R.id.songListening_imageView_cover))
 					.setScaleType(ScaleType.FIT_XY);
+			rep = true;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (!songListening_boolean_songSearched) {
-			songListening_nextSongs(songListening_list_futureArtists);
+
+		return rep;
+	}
+
+	public void addCurrentToFav() {
+
+		Bundle bundle = new Bundle();
+		bundle.putString("p", songListening_Track_currentTrack.toString());
+		bundle.putString("track_id",
+				String.valueOf(songListening_Track_currentTrack.getId()));
+		DeezerRequest addFav_request = new DeezerRequest("/user/"
+				+ MainActivity.userId + "/tracks", bundle, "POST");
+		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
+				addFavHandler);
+		asyncDeezerTask.execute(addFav_request);
+	}
+
+	private class AddFavHandler implements RequestListener {
+
+		@Override
+		public void onComplete(String arg0, Object arg1) {
+			Toast.makeText(getApplicationContext(), "Track added to fav",
+					Toast.LENGTH_SHORT).show();
+			SongInputActivity.songInput_listTrack_listFav
+					.add(songListening_Track_currentTrack);
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_yes);
+			Log.i("SongListening / addFavHandler", "Track added to fav : "
+					+ songListening_Track_currentTrack);
 		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "DeezerError : " + arg0);
+		}
+
+		@Override
+		public void onIOException(IOException arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "IOException : " + arg0);
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException arg0,
+				Object arg1) {
+			Log.w("SongListening / AddFavHandler", "MalformedURLException : "
+					+ arg0);
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "OAuthException : " + arg0);
+		}
+
+	}
+
+	public void removeCurrentFromFav() {
+
 	}
 
 } // songListeningActivity

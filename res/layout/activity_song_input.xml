@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/songInput_button_search"
         android:layout_centerHorizontal="true"
-        android:onClick="songInput_onClick_goToFavorite"
+        android:onClick="songInput_onClick_goToFavorite_v2"
         android:text="@string/songInput_button_goToFavorite"
         />
 

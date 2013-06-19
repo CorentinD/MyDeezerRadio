@@ -74,6 +74,17 @@
         android:onClick="songListening_onClick_next"
         android:src="@drawable/deezer_button_next" />
 
+    <ImageButton
+        android:id="@+id/songListening_button_fav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/songListening_button_play"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/songListening_imageButton_fav_description"
+        android:onClick="songListening_onClick_fav"
+        android:src="@drawable/deezer_button_fav_no" />
+
     <Button
         android:id="@+id/songListening_button_return"
         android:layout_width="wrap_content"
