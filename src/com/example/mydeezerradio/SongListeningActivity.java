@@ -221,6 +221,8 @@ public class SongListeningActivity extends Activity {
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
+	
+
 
 	public void songListening_nextArtist(Artist prev_artist) {
 		DeezerRequest request_artists = new DeezerRequest("artist/"

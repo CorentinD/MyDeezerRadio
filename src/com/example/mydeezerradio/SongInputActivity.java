@@ -2,6 +2,7 @@ package com.example.mydeezerradio;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.TargetApi;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.deezer.sdk.AsyncDeezerTask;
 import com.deezer.sdk.DeezerConnect;
@@ -33,7 +35,11 @@ public class SongInputActivity extends Activity {
 			MainActivity.APP_ID);
 	/** DeezerRequestListener object used to handle requests. */
 	RequestListener songInputRequestHandler = new SongInputRequestHandler();
+	RequestListener songInputFavHandler = new SongInputFavHandler();
+	RequestListener previewRequestHandler = new PreviewRequestHandler();
 	public static List<Track> listTracks;
+	private List<Track> listFav;
+	private int songInput_compteur_i = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +53,7 @@ public class SongInputActivity extends Activity {
 				"restore : " + sessionStore.restore(deezerConnect, this));
 		Log.i("SongInput / onCreate", "user : " + MainActivity.user_data);
 
-		listTracks = null;
+		listTracks = new ArrayList<Track>();
 	}
 
 	public void songInput_onClick_return(View view) {
@@ -74,14 +80,21 @@ public class SongInputActivity extends Activity {
 
 	public void songInput_onClick_goToFavorite(View view) {
 		AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(deezerConnect,
-				songInputRequestHandler);
+				songInputFavHandler);
 		DeezerRequest request_favorite = new DeezerRequest("/user/"
 				+ MainActivity.userId + "/tracks");
 		searchAsyncFav.execute(request_favorite);
+		Toast.makeText(this, "Loading your fav", Toast.LENGTH_SHORT).show();
 	}
 
-	private void TrackSearchComplete() {
-		Log.w("SongInput / TrackSearchComplete", "done");
+	private void FavTrackSearchComplete() {
+
+		AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(deezerConnect,
+				previewRequestHandler);
+		DeezerRequest request_preview = new DeezerRequest("/track/"
+				+ listFav.get(songInput_compteur_i).getId());
+		searchAsyncFav.execute(request_preview);
+		++songInput_compteur_i;
 	}
 
 	private class SongInputRequestHandler implements RequestListener {
@@ -91,11 +104,13 @@ public class SongInputActivity extends Activity {
 						.readList(response);
 				Log.w("SongInput / onComplete", "received Track list : "
 						+ listTracks);
-				TrackSearchComplete();
+
 			} catch (IllegalStateException e) {
 				Log.e("SongInput / onComplete", "IllegalStateException : " + e);
 				e.printStackTrace();
 			}// catch
+
+			Log.w("SongInput / TrackSearchComplete", "done");
 
 			Intent intent = new Intent(getApplicationContext(),
 					SongSelectionActivity.class);
@@ -124,6 +139,82 @@ public class SongInputActivity extends Activity {
 					+ arg0 + " / " + arg1);
 		}
 	}// class SongInputRequestHandler
+
+	private class SongInputFavHandler implements RequestListener {
+		public void onComplete(String response, Object requestId) {
+
+			listFav = new ListDeezerDataReader<Track>(Track.class)
+					.readList(response);
+			Log.w("SongInput / FavHandler", "received Track list : " + listFav);
+			FavTrackSearchComplete();
+		}
+
+		public void onIOException(IOException e, Object requestId) {
+			Log.w("SongInputActivity / FavHandler", "IOException");
+		}
+
+		public void onMalformedURLException(MalformedURLException e,
+				Object requestId) {
+			Log.w("SongInputActivity / FavHandler", "onMalformedURLException");
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongInputActivity / FavHandler",
+					"onDeezerError : " + arg0.toString());
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongInputActivity / FavHandler", "onOAuthException" + arg0
+					+ " / " + arg1);
+		}
+	}// class SongInputFavHandler
+
+	private class PreviewRequestHandler implements RequestListener {
+		public void onComplete(String response, Object requestId) {
+
+			Track temp_track = new DeezerDataReader<Track>(Track.class)
+					.read(response);
+			Log.w("SongInput / PreviewHandler", "received Track : "
+					+ temp_track);
+			listTracks.add(temp_track);
+
+			if (songInput_compteur_i < listFav.size()) {
+				FavTrackSearchComplete();
+			} else {
+				Log.i("SongInput / PreviewRequestHandler",
+						"size Fav : " + listFav.size() + " / size list : "
+								+ listTracks.size());
+				Intent intent = new Intent(getApplicationContext(),
+						SongSelectionActivity.class);
+				startActivity(intent);
+			}
+
+		}
+
+		public void onIOException(IOException e, Object requestId) {
+			Log.w("SongInputActivity / PreviewHandler", "IOException");
+		}
+
+		public void onMalformedURLException(MalformedURLException e,
+				Object requestId) {
+			Log.w("SongInputActivity / PreviewHandler",
+					"onMalformedURLException");
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongInputActivity / PreviewHandler", "onDeezerError : "
+					+ arg0.toString());
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongInputActivity / PreviewHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
+		}
+	}// class PreviewRequestHandler
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.

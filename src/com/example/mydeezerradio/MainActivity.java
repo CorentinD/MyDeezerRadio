@@ -124,11 +124,6 @@ public class MainActivity extends Activity {
 			Log.w("MainActivity / onComplete", access_token);
 
 			searchUser();
-			// go to the inputSong activity
-			Intent intent = new Intent(getApplicationContext(),
-					SongInputActivity.class);
-			startActivity(intent);
-
 		}// met
 
 		@Override
@@ -167,6 +162,10 @@ public class MainActivity extends Activity {
 		sharedPref_editor.commit();
 		user_data = user;
 		Log.i("MainActivity / searchUserFinish", "user request : " + user);
+		// go to the inputSong activity
+		Intent intent = new Intent(getApplicationContext(),
+				SongInputActivity.class);
+		startActivity(intent);
 	}
 
 	private class UserRequestHandler implements RequestListener {

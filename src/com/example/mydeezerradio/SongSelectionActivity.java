@@ -1,7 +1,5 @@
 package com.example.mydeezerradio;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -21,13 +19,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.deezer.sdk.AsyncDeezerTask;
 import com.deezer.sdk.DeezerConnect;
 import com.deezer.sdk.DeezerConnectImpl;
-import com.deezer.sdk.DeezerError;
-import com.deezer.sdk.DeezerRequest;
-import com.deezer.sdk.OAuthException;
-import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
 
 public class SongSelectionActivity extends Activity {
@@ -39,10 +32,9 @@ public class SongSelectionActivity extends Activity {
 	SharedPreferences.Editor sharedPref_editor;
 	ArrayList<String> SongSelection_list_searchResults;
 	public final static String songSelection_string_noResults = "No results";
-	public static Track trackSelected = new Track();;
+	public static Track trackSelected = new Track();
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
-	private SongSelectionRequestHandler songSelectionRequestHandler = new SongSelectionRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,22 +71,12 @@ public class SongSelectionActivity extends Activity {
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
 
-						if (SongInputActivity.listTracks.get(position).getPreview() == null) {
-							AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(
-									deezerConnect, songSelectionRequestHandler);
-							DeezerRequest request_preview = new DeezerRequest(
-									"/track/"
-											+ SongInputActivity.listTracks.get(
-													position).getId());
-							searchAsyncFav.execute(request_preview);
-						}else {
-							trackSelected=SongInputActivity.listTracks.get(position);
-						}
-						//TODO : problem with the fav songs : not initialised;
-						
+						trackSelected = SongInputActivity.listTracks
+								.get(position);
 						TrackSearchComplete();
-						
 					}
+					// TODO : problem with the fav songs : not initialised;
+
 				});
 	}// onCreate
 
@@ -103,50 +85,15 @@ public class SongSelectionActivity extends Activity {
 	}
 
 	public void TrackSearchComplete() {
-		
+
 		Intent intent = new Intent(getApplicationContext(),
 				SongListeningActivity.class);
 
 		startActivity(intent);
-		
+
 		Log.w("SongSelection / onComplete",
 				"received Track : " + trackSelected.getPreview());
 	}
-
-	private class SongSelectionRequestHandler implements RequestListener {
-		public void onComplete(String response, Object requestId) {
-			try {
-				trackSelected = new DeezerDataReader<Track>(Track.class)
-						.read(response);
-				TrackSearchComplete();
-			} catch (IllegalStateException e) {
-				Log.e("SongSelection / onComplete", "IllegalStateException : "
-						+ e);
-				e.printStackTrace();
-			}// catch
-		}
-
-		public void onIOException(IOException e, Object requestId) {
-			Log.w("SongSelection / requestHandler", "IOException");
-		}
-
-		public void onMalformedURLException(MalformedURLException e,
-				Object requestId) {
-			Log.w("SongSelection / requestHandler", "onMalformedURLException");
-		}
-
-		@Override
-		public void onDeezerError(DeezerError arg0, Object arg1) {
-			Log.w("SongSelection / requestHandler",
-					"onDeezerError : " + arg0.toString());
-		}
-
-		@Override
-		public void onOAuthException(OAuthException arg0, Object arg1) {
-			Log.w("SongSelection / requestHandler", "onOAuthException" + arg0
-					+ " / " + arg1);
-		}
-	}// class SongInputRequestHandler
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
