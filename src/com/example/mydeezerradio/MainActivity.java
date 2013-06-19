@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 	public final static String APP_ID = "119355";
 	/** Permissions requested on Deezer accounts. */
 	private final static String[] PERMISSIONS = new String[] { "basic_access",
-			"offline_access", "manage_library" };
+			"delete_library", "manage_library" };
 	/** DeezerConnect object used for authentification or request. */
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(APP_ID);
 
@@ -143,7 +143,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onOAuthException(OAuthException oAuthException) {
-			Log.w("Main / onOAuthException",  oAuthException);
+			Log.w("Main / onOAuthException", oAuthException);
 		}// met
 	}// inner class
 

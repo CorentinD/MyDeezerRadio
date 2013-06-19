@@ -54,6 +54,7 @@ public class SongListeningActivity extends Activity {
 	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
 	private RequestListener addFavHandler = new AddFavHandler();
+	private RequestListener delFavHandler = new DelFavHandler();
 
 	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
 	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
@@ -69,6 +70,9 @@ public class SongListeningActivity extends Activity {
 
 	String TAG2 = "par ou passes tu ?";
 	String TAG = "SongListening";
+	
+	//TODO : getAlbum pour les TOP5 & les stream pour les recherches
+	//TODO : fenetres et pas toast (empeche de cliquer avant que ça soit bon)
 
 	protected void onPause() {
 		super.onPause();
@@ -150,6 +154,8 @@ public class SongListeningActivity extends Activity {
 	}
 
 	public void songListening_onClick_return(View view) {
+		songListening_player_songPlayer.stop();
+		songListening_player_songPlayer.release();
 		Intent intent = new Intent(this, SongInputActivity.class);
 		startActivity(intent);
 	}
@@ -414,18 +420,19 @@ public class SongListeningActivity extends Activity {
 
 	public boolean containsArtist(List<Artist> listT, Artist art) {
 		Iterator<Artist> it = listT.iterator();
-		int i = 0;
-		Log.e("SongListening / containsArtist", "size list : " + listT.size());
+		// int i = 0;
+		// Log.e("SongListening / containsArtist", "size list : " +
+		// listT.size());
 		while (it.hasNext()) {
 			Artist temp_art = it.next();
 			if (temp_art.getId() == art.getId()) {
 				return true;
 			}
-			Log.w("SongListening / containsArtist", "Artist " + i + " : "
-					+ temp_art.toString() + " / New Artist : " + art.toString());
-			Log.w("SongListening / containsArtist",
-					"res = " + (temp_art.getId() == art.getId()));
-			++i;
+			// Log.w("SongListening / containsArtist", "Artist " + i + " : "
+			// + temp_art.toString() + " / New Artist : " + art.toString());
+			// Log.w("SongListening / containsArtist",
+			// "res = " + (temp_art.getId() == art.getId()));
+			// ++i;
 		}
 
 		return false;
@@ -542,6 +549,7 @@ public class SongListeningActivity extends Activity {
 					.add(songListening_Track_currentTrack);
 			((ImageView) findViewById(R.id.songListening_button_fav))
 					.setImageResource(R.drawable.deezer_button_fav_yes);
+			currentTrack_isFav = true;
 			Log.i("SongListening / addFavHandler", "Track added to fav : "
 					+ songListening_Track_currentTrack);
 		}
@@ -571,6 +579,53 @@ public class SongListeningActivity extends Activity {
 	}
 
 	public void removeCurrentFromFav() {
+		Bundle bundle = new Bundle();
+		bundle.putString("d", songListening_Track_currentTrack.toString());
+		bundle.putString("track_id",
+				String.valueOf(songListening_Track_currentTrack.getId()));
+		DeezerRequest delFav_request = new DeezerRequest("/user/"
+				+ MainActivity.userId + "/tracks", bundle, "DELETE");
+		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
+				delFavHandler);
+		asyncDeezerTask.execute(delFav_request);
+	}
+
+	private class DelFavHandler implements RequestListener {
+
+		@Override
+		public void onComplete(String arg0, Object arg1) {
+			Toast.makeText(getApplicationContext(), "Track deleted from fav",
+					Toast.LENGTH_SHORT).show();
+			SongInputActivity.songInput_listTrack_listFav
+					.remove(songListening_Track_currentTrack);
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_no);
+			currentTrack_isFav = false;
+			Log.i("SongListening / addFavHandler", "Track deleted from fav : "
+					+ songListening_Track_currentTrack);
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "DeezerError : " + arg0);
+		}
+
+		@Override
+		public void onIOException(IOException arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "IOException : " + arg0);
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException arg0,
+				Object arg1) {
+			Log.w("SongListening / AddFavHandler", "MalformedURLException : "
+					+ arg0);
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongListening / AddFavHandler", "OAuthException : " + arg0);
+		}
 
 	}
 
