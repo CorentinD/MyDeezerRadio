@@ -26,9 +26,6 @@ import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
 
 public class MainActivity extends Activity {
-
-	// TODO : something about the sessionStore and the deezerConnect
-
 	public final static String TAG = "com.example.mydeezerradio.Mainactivity";
 	final String defValue = "erreur recuperation données";
 	public static int userId = 0;

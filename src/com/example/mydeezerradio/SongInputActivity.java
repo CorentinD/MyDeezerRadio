@@ -35,6 +35,7 @@ public class SongInputActivity extends Activity {
 	RequestListener songInputFavHandler_v2 = new SongInputFavHandler_v2();
 	public static List<Track> listTracks;
 	public static List<Track> songInput_listTrack_listFav;
+	private boolean buttons_areClickable = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,26 @@ public class SongInputActivity extends Activity {
 	}
 
 	public void songInput_onClick_search(View view) {
+		if (buttons_areClickable) {
+			search();
+		}
+	} // songInput_onClick_search
 
+	public void songInput_onClick_goToFavorite_v2(View view) {
+		if (buttons_areClickable) {
+			goToFav();
+		}
+	} // songInput_onClick_goToFavorite_v2
+
+	public void goToFav() {
+		listTracks = songInput_listTrack_listFav;
+
+		Intent intent = new Intent(getApplicationContext(),
+				SongSelectionActivity.class);
+		startActivity(intent);
+	} // goToFav
+
+	public void search() {
 		String song = String
 				.valueOf((((TextView) findViewById(R.id.songInput_editText_song))
 						.getText()));
@@ -71,16 +91,7 @@ public class SongInputActivity extends Activity {
 					deezerConnect, songInputRequestHandler);
 			searchAsyncTracks.execute(request_songs);
 		}
-	} // songInput_onClick_search
-
-	public void songInput_onClick_goToFavorite_v2(View view) {
-		listTracks = songInput_listTrack_listFav;
-
-		Intent intent = new Intent(getApplicationContext(),
-				SongSelectionActivity.class);
-		startActivity(intent);
-
-	}
+	} // search
 
 	public void songInput_lookForFav() {
 		AsyncDeezerTask searchAsyncFav = new AsyncDeezerTask(deezerConnect,
@@ -93,6 +104,7 @@ public class SongInputActivity extends Activity {
 
 	public void songInput_lookForFav_finished() {
 		Toast.makeText(this, "Fav loaded", Toast.LENGTH_SHORT).show();
+		buttons_areClickable = true;
 	}
 
 	private class SongInputRequestHandler implements RequestListener {

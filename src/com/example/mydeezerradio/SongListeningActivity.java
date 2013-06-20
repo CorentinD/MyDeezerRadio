@@ -68,6 +68,7 @@ public class SongListeningActivity extends Activity {
 
 	private boolean songListening_boolean_songSearched = false;
 	private boolean toDo = false;
+	private boolean buttons_areClickable = false;
 
 	String TAG2 = "par ou passes tu ?";
 	String TAG = "SongListening";
@@ -145,29 +146,39 @@ public class SongListeningActivity extends Activity {
 	}
 
 	public void songListening_onClick_play(View view) {
-		play();
+		if (buttons_areClickable) {
+			play();
+		}
 	}
 
 	public void songListening_onClick_pause(View view) {
-		songListening_player_songPlayer.pause();
+		if (buttons_areClickable) {
+			songListening_player_songPlayer.pause();
+		}
 	}
 
 	public void songListening_onClick_next(View view) {
-		goTo_nextSong();
+		if (buttons_areClickable) {
+			goTo_nextSong();
+		}
 	}
 
 	public void songListening_onClick_return(View view) {
-		songListening_player_songPlayer.stop();
-		songListening_player_songPlayer.release();
-		Intent intent = new Intent(this, SongInputActivity.class);
-		startActivity(intent);
+		if (buttons_areClickable) {
+			songListening_player_songPlayer.stop();
+			songListening_player_songPlayer.release();
+			Intent intent = new Intent(this, SongInputActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	public void songListening_onClick_fav(View view) {
-		if (!currentTrack_isFav) {
-			addCurrentToFav();
-		} else {
-			removeCurrentFromFav();
+		if (buttons_areClickable) {
+			if (!currentTrack_isFav) {
+				addCurrentToFav();
+			} else {
+				removeCurrentFromFav();
+			}
 		}
 	}
 
@@ -478,6 +489,7 @@ public class SongListeningActivity extends Activity {
 					Toast.makeText(getApplicationContext(),
 							"Buffering done, enjoy !", Toast.LENGTH_SHORT)
 							.show();
+					buttons_areClickable = true;
 				}
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
