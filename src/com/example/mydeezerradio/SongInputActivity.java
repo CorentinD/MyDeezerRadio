@@ -26,7 +26,7 @@ import com.deezer.sdk.SessionStore;
 public class SongInputActivity extends Activity {
 
 	public static final String EXTRA_SONGINPUT_SEARCH = "songInput_search_song";
-	/** DeezerConnect object used for auhtentification or request. */
+	/** DeezerConnect object used for auth or request. */
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
 	/** DeezerRequestListener object used to handle requests. */
@@ -35,9 +35,6 @@ public class SongInputActivity extends Activity {
 	RequestListener songInputFavHandler_v2 = new SongInputFavHandler_v2();
 	public static List<Track> listTracks;
 	public static List<Track> songInput_listTrack_listFav;
-
-	// TODO : remplir la list listFav static (complete) même si on ne passe pas
-	// par les favoris
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

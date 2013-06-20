@@ -53,6 +53,7 @@ public class SongListeningActivity extends Activity {
 	private PlayerHandler playerHandler = new PlayerHandler();
 	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
 	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
+	private RequestListener trackInfoRequestHandler = new TrackInfoRequestHandler();
 	private RequestListener addFavHandler = new AddFavHandler();
 	private RequestListener delFavHandler = new DelFavHandler();
 
@@ -70,9 +71,8 @@ public class SongListeningActivity extends Activity {
 
 	String TAG2 = "par ou passes tu ?";
 	String TAG = "SongListening";
-	
-	//TODO : getAlbum pour les TOP5 & les stream pour les recherches
-	//TODO : fenetres et pas toast (empeche de cliquer avant que ça soit bon)
+
+	// TODO : fenetres et pas toast (empeche de cliquer avant que ça soit bon)
 
 	protected void onPause() {
 		super.onPause();
@@ -261,6 +261,169 @@ public class SongListeningActivity extends Activity {
 		songListening_boolean_songSearched = true;
 	} // songListening_nextSongs
 
+	public ArrayList<Integer> parseResult(String informations) {
+		ArrayList<Integer> res = new ArrayList<Integer>();
+
+		if (informations.contains("total\":0")) {
+			res.add(-1);
+			return res;
+		}
+
+		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
+
+		for (int i = 0; i < info_tab.length; ++i) {
+			String current = info_tab[i];
+			// song
+			int index_nbFans = current.indexOf("nb_fan\":") + 8;
+			int index_radio = current.indexOf(",\"radio");
+			String current_nbFan = current.substring(index_nbFans, index_radio);
+			res.add(Integer.parseInt(current_nbFan));
+
+		}
+		return res;
+	} // parseResult
+
+	public void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
+		int i = 0;
+		for (Artist a : temp_list) {
+			a.setNbFan(list_fans.get(i));
+			++i;
+		}
+	} // add_nbFans
+
+	public void tri_ArrayList(List<Integer> list) {
+		Collections.sort(list);
+	}
+
+	public boolean containsArtist(List<Artist> listT, Artist art) {
+		Iterator<Artist> it = listT.iterator();
+		while (it.hasNext()) {
+			Artist temp_art = it.next();
+			if (temp_art.getId() == art.getId()) {
+				return true;
+			}
+		}
+		return false;
+	} // containsArtist
+
+	public void goTo_nextSong() {
+
+		if (songListening_boolean_songSearched) {
+
+			songListening_Track_currentTrack = songListening_list_futureSongs
+					.get(songListening_trackBeingListened);
+			++songListening_trackBeingListened;
+			--songListening_numberOfTracks_i;
+			songListening_player_songPlayer.stop();
+			songListening_textView_author
+					.setText(songListening_Track_currentTrack.toString());
+			play();
+
+			if (toDo) {
+				Log.i("SongListening / goTo_NextSong", "toDo : " + toDo);
+				songListening_nextSongs(songListening_list_futureArtists);
+				toDo = false;
+			}
+			if (songListening_numberOfTracks_i == 2) {
+				songListening_list_futureArtists = new ArrayList<Artist>();
+				songListening_nextArtist(songListening_Track_currentTrack
+						.getArtist());
+				toDo = true;
+			}
+
+		}
+
+	}// goTo_nextSong
+
+	public void play() {
+
+		Log.i("SongListening / play", "Song : "
+				+ songListening_Track_currentTrack);
+
+		Log.i("SongListening / play ", "stream() : "
+				+ songListening_Track_currentTrack.getStream());
+
+		if (songListening_Track_currentTrack.hasStream()) {
+			songListening_player_songPlayer.init(
+					songListening_Track_currentTrack.getId(),
+					songListening_Track_currentTrack.getStream());
+		} else {
+			songListening_player_songPlayer.init(
+					songListening_Track_currentTrack.getId(),
+					songListening_Track_currentTrack.getPreview());
+		}
+
+		currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
+				.contains(songListening_Track_currentTrack);
+		if (currentTrack_isFav) {
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_yes);
+		} else {
+			((ImageView) findViewById(R.id.songListening_button_fav))
+					.setImageResource(R.drawable.deezer_button_fav_no);
+		}
+
+		songListening_player_songPlayer.play();
+
+		Log.i("SongListening / play", "cover set : " + songListening_setImage());
+
+		if (!songListening_boolean_songSearched) {
+			songListening_nextSongs(songListening_list_futureArtists);
+		}
+	} // play
+
+	public boolean songListening_setImage() {
+		boolean rep = false;
+		try {
+			URL url = new URL(songListening_Track_currentTrack.getAlbum()
+					.getCover());
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+			InputStream input = connection.getInputStream();
+			((ImageView) findViewById(R.id.songListening_imageView_cover))
+					.setImageBitmap(BitmapFactory.decodeStream(input));
+			((ImageView) findViewById(R.id.songListening_imageView_cover))
+					.setScaleType(ScaleType.FIT_XY);
+			rep = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return rep;
+	}
+
+	public void addCurrentToFav() {
+
+		Bundle bundle = new Bundle();
+		bundle.putString("p", songListening_Track_currentTrack.toString());
+		bundle.putString("track_id",
+				String.valueOf(songListening_Track_currentTrack.getId()));
+		DeezerRequest addFav_request = new DeezerRequest("/user/"
+				+ MainActivity.userId + "/tracks", bundle, "POST");
+		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
+				addFavHandler);
+		asyncDeezerTask.execute(addFav_request);
+	}
+
+	public void removeCurrentFromFav() {
+		Bundle bundle = new Bundle();
+		bundle.putString("d", songListening_Track_currentTrack.toString());
+		bundle.putString("track_id",
+				String.valueOf(songListening_Track_currentTrack.getId()));
+		DeezerRequest delFav_request = new DeezerRequest("/user/"
+				+ MainActivity.userId + "/tracks", bundle, "DELETE");
+		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
+				delFavHandler);
+		asyncDeezerTask.execute(delFav_request);
+	}
+
+	public void getWholeTrackInfo(long trackId) {
+		DeezerRequest requestTrackInfo = new DeezerRequest("track/" + trackId);
+		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
+				trackInfoRequestHandler);
+		searchAsyncArtist.execute(requestTrackInfo);
+	}
+
 	private class NextArtistSearchHandler implements RequestListener {
 		@SuppressWarnings("unchecked")
 		public void onComplete(String response, Object requestId) {
@@ -343,15 +506,9 @@ public class SongListeningActivity extends Activity {
 					random_number = temp_trackList.size();
 				}
 
-				songListening_track_trackToAdd = temp_trackList.get((int) (Math
-						.random() * random_number));
-
-				songListening_list_futureSongs
-						.add(songListening_track_trackToAdd);
-
-				Log.i("SongListening / TopSongSearchHandler", "List : "
-						+ songListening_list_futureSongs);
-
+				// get a random track of TOP and complete it with infos
+				getWholeTrackInfo((temp_trackList
+						.get((int) (Math.random() * random_number))).getId());
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
 						+ e);
@@ -361,183 +518,27 @@ public class SongListeningActivity extends Activity {
 		}
 
 		public void onIOException(IOException e, Object requestId) {
-			Log.w("SongListening / NextSongSearchHandler", "IOException");
+			Log.w("SongListening / TopSongSearchHandler", "IOException");
 		}
 
 		public void onMalformedURLException(MalformedURLException e,
 				Object requestId) {
-			Log.w("SongListening / NextSongSearchHandler",
+			Log.w("SongListening / TopSongSearchHandler",
 					"onMalformedURLException");
 		}
 
 		@Override
 		public void onDeezerError(DeezerError arg0, Object arg1) {
-			Log.w("SongListening / NextSongSearchHandler", "onDeezerError : "
+			Log.w("SongListening / TopSongSearchHandler", "onDeezerError : "
 					+ arg0.toString());
 		}
 
 		@Override
 		public void onOAuthException(OAuthException arg0, Object arg1) {
-			Log.w("SongListening / NextSongSearchHandler", "onOAuthException"
+			Log.w("SongListening / TopSongSearchHandler", "onOAuthException"
 					+ arg0 + " / " + arg1);
 		}
-	}// class
-
-	public ArrayList<Integer> parseResult(String informations) {
-		ArrayList<Integer> res = new ArrayList<Integer>();
-
-		if (informations.contains("total\":0")) {
-			res.add(-1);
-			return res;
-		}
-
-		String[] info_tab = informations.split("(?<=\\}),(?=\\{)");
-
-		for (int i = 0; i < info_tab.length; ++i) {
-			String current = info_tab[i];
-			// song
-			int index_nbFans = current.indexOf("nb_fan\":") + 8;
-			int index_radio = current.indexOf(",\"radio");
-			String current_nbFan = current.substring(index_nbFans, index_radio);
-			res.add(Integer.parseInt(current_nbFan));
-
-		}
-		return res;
-	} // parseResult
-
-	public void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
-
-		int i = 0;
-		for (Artist a : temp_list) {
-			a.setNbFan(list_fans.get(i));
-			++i;
-		}
-	} // add_nbFans
-
-	public void tri_ArrayList(List<Integer> list) {
-		Collections.sort(list);
-	}
-
-	public boolean containsArtist(List<Artist> listT, Artist art) {
-		Iterator<Artist> it = listT.iterator();
-		// int i = 0;
-		// Log.e("SongListening / containsArtist", "size list : " +
-		// listT.size());
-		while (it.hasNext()) {
-			Artist temp_art = it.next();
-			if (temp_art.getId() == art.getId()) {
-				return true;
-			}
-			// Log.w("SongListening / containsArtist", "Artist " + i + " : "
-			// + temp_art.toString() + " / New Artist : " + art.toString());
-			// Log.w("SongListening / containsArtist",
-			// "res = " + (temp_art.getId() == art.getId()));
-			// ++i;
-		}
-
-		return false;
-	} // containsArtist
-
-	public void goTo_nextSong() {
-
-		if (songListening_boolean_songSearched) {
-
-			songListening_Track_currentTrack = songListening_list_futureSongs
-					.get(songListening_trackBeingListened);
-			++songListening_trackBeingListened;
-			--songListening_numberOfTracks_i;
-			songListening_player_songPlayer.stop();
-			songListening_textView_author
-					.setText(songListening_Track_currentTrack.toString());
-			play();
-
-			if (toDo) {
-				Log.i("SongListening / goTo_NextSong", "toDo : " + toDo);
-				songListening_nextSongs(songListening_list_futureArtists);
-				toDo = false;
-			}
-			if (songListening_numberOfTracks_i == 2) {
-				songListening_list_futureArtists = new ArrayList<Artist>();
-				songListening_nextArtist(songListening_Track_currentTrack
-						.getArtist());
-				toDo = true;
-			}
-
-		}
-
-	}// goTo_nextSong
-
-	public void play() {
-
-		Log.i("SongListening / play", "Song : "
-				+ songListening_Track_currentTrack);
-
-		Log.i("SongListening / play ", "stream() : "
-				+ songListening_Track_currentTrack.getStream());
-
-		// TODO : si vient des fav : stream==false / si recherche stream==null
-
-		if (songListening_Track_currentTrack.hasStream()) {
-			songListening_player_songPlayer.init(
-					songListening_Track_currentTrack.getId(),
-					songListening_Track_currentTrack.getStream());
-		} else {
-			songListening_player_songPlayer.init(
-					songListening_Track_currentTrack.getId(),
-					songListening_Track_currentTrack.getPreview());
-		}
-
-		currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
-				.contains(songListening_Track_currentTrack);
-		if (currentTrack_isFav) {
-			((ImageView) findViewById(R.id.songListening_button_fav))
-					.setImageResource(R.drawable.deezer_button_fav_yes);
-		} else {
-			((ImageView) findViewById(R.id.songListening_button_fav))
-					.setImageResource(R.drawable.deezer_button_fav_no);
-		}
-
-		songListening_player_songPlayer.play();
-
-		Log.i("SongListening / play", "cover set : " + songListening_setImage());
-
-		if (!songListening_boolean_songSearched) {
-			songListening_nextSongs(songListening_list_futureArtists);
-		}
-	} // play
-
-	public boolean songListening_setImage() {
-		boolean rep = false;
-		try {
-			URL url = new URL(songListening_Track_currentTrack.getAlbum()
-					.getCover());
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			InputStream input = connection.getInputStream();
-			((ImageView) findViewById(R.id.songListening_imageView_cover))
-					.setImageBitmap(BitmapFactory.decodeStream(input));
-			((ImageView) findViewById(R.id.songListening_imageView_cover))
-					.setScaleType(ScaleType.FIT_XY);
-			rep = true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return rep;
-	}
-
-	public void addCurrentToFav() {
-
-		Bundle bundle = new Bundle();
-		bundle.putString("p", songListening_Track_currentTrack.toString());
-		bundle.putString("track_id",
-				String.valueOf(songListening_Track_currentTrack.getId()));
-		DeezerRequest addFav_request = new DeezerRequest("/user/"
-				+ MainActivity.userId + "/tracks", bundle, "POST");
-		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
-				addFavHandler);
-		asyncDeezerTask.execute(addFav_request);
-	}
+	}// class TopSongSearchHandler
 
 	private class AddFavHandler implements RequestListener {
 
@@ -578,18 +579,6 @@ public class SongListeningActivity extends Activity {
 
 	}
 
-	public void removeCurrentFromFav() {
-		Bundle bundle = new Bundle();
-		bundle.putString("d", songListening_Track_currentTrack.toString());
-		bundle.putString("track_id",
-				String.valueOf(songListening_Track_currentTrack.getId()));
-		DeezerRequest delFav_request = new DeezerRequest("/user/"
-				+ MainActivity.userId + "/tracks", bundle, "DELETE");
-		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
-				delFavHandler);
-		asyncDeezerTask.execute(delFav_request);
-	}
-
 	private class DelFavHandler implements RequestListener {
 
 		@Override
@@ -628,5 +617,43 @@ public class SongListeningActivity extends Activity {
 		}
 
 	}
+
+	private class TrackInfoRequestHandler implements RequestListener {
+		@Override
+		public void onComplete(String response, Object arg1) {
+			songListening_track_trackToAdd = new DeezerDataReader<Track>(
+					Track.class).read(response);
+
+			songListening_list_futureSongs.add(songListening_track_trackToAdd);
+
+			Log.i("SongListening / TopSongSearchHandler", "List : "
+					+ songListening_list_futureSongs);
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongListening / TrackInfoRequestHandler", "onDeezerError"
+					+ arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onIOException(IOException arg0, Object arg1) {
+			Log.w("SongListening / TrackInfoRequestHandler", "IOException"
+					+ arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException arg0,
+				Object arg1) {
+			Log.w("SongListening / TrackInfoRequestHandler",
+					"onMalformedURLException" + arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongListening / TrackInfoRequestHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
+		}
+	} // class TrackInfoRequestHandler
 
 } // songListeningActivity

@@ -68,8 +68,6 @@ public class SongSelectionActivity extends Activity {
 								.get(position);
 						TrackSearchComplete();
 					}
-					// TODO : problem with the fav songs : not initialised;
-
 				});
 	}// onCreate
 
