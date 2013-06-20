@@ -50,30 +50,25 @@ public class SongListeningActivity extends Activity {
 			MainActivity.APP_ID);
 
 	private Player songListening_player_songPlayer;
-	private PlayerHandler playerHandler = new PlayerHandler();
-	private RequestListener nextArtistRequestHandler = new NextArtistSearchHandler();
-	private RequestListener topSongRequestHandler = new TopSongSearchHandler();
-	private RequestListener trackInfoRequestHandler = new TrackInfoRequestHandler();
-	private RequestListener addFavHandler = new AddFavHandler();
-	private RequestListener delFavHandler = new DelFavHandler();
+	private PlayerHandler songListening_playerHandler = new PlayerHandler();
+	private RequestListener songListening_nextArtistRequestHandler = new SongListening_NextArtistSearchHandler();
+	private RequestListener songListening_topSongRequestHandler = new SongListening_TopSongSearchHandler();
+	private RequestListener songListening_trackInfoRequestHandler = new SongListening_TrackInfoRequestHandler();
+	private RequestListener songListening_addFavHandler = new SongListening_AddFavHandler();
+	private RequestListener songListening_delFavHandler = new SongListening_DelFavHandler();
 
 	private List<Artist> songListening_list_futureArtists = new ArrayList<Artist>();
 	private List<Track> songListening_list_futureSongs = new ArrayList<Track>();
 	private Track songListening_track_trackToAdd;
 	private Track songListening_Track_currentTrack;
-	boolean currentTrack_isFav = false;
+	private boolean songListening_boolean_currentTrack_isFav = false;
 
-	private int songListening_numberOfTracks_i = 1;
+	private int songListening_numberOfArtists_i = 1;
 	private int songListening_trackBeingListened = 0;
 
 	private boolean songListening_boolean_songSearched = false;
-	private boolean toDo = false;
-	private boolean buttons_areClickable = false;
-
-	String TAG2 = "par ou passes tu ?";
-	String TAG = "SongListening";
-
-	// TODO : fenetres et pas toast (empeche de cliquer avant que ça soit bon)
+	private boolean songListening_boolean_toDo = false;
+	private boolean songListening_boolean_buttons_areClickable = false;
 
 	protected void onPause() {
 		super.onPause();
@@ -94,7 +89,7 @@ public class SongListeningActivity extends Activity {
 
 		Toast.makeText(this, "Buffering, please wait", Toast.LENGTH_SHORT)
 				.show();
-		songListening_Track_currentTrack = SongSelectionActivity.trackSelected;
+		songListening_Track_currentTrack = SongSelectionActivity.songSelection_track_trackSelected;
 
 		songListening_textView_author = (TextView) findViewById(R.id.songListening_textView_author);
 
@@ -116,17 +111,17 @@ public class SongListeningActivity extends Activity {
 					new WifiOnlyNetworkStateChecker()).createPlayer();
 
 			songListening_player_songPlayer
-					.addOnBufferErrorListener(playerHandler);
+					.addOnBufferErrorListener(songListening_playerHandler);
 			songListening_player_songPlayer
-					.addOnBufferStateChangeListener(playerHandler);
+					.addOnBufferStateChangeListener(songListening_playerHandler);
 			songListening_player_songPlayer
-					.addOnBufferProgressListener(playerHandler);
+					.addOnBufferProgressListener(songListening_playerHandler);
 			songListening_player_songPlayer
-					.addOnPlayerErrorListener(playerHandler);
+					.addOnPlayerErrorListener(songListening_playerHandler);
 			songListening_player_songPlayer
-					.addOnPlayerStateChangeListener(playerHandler);
+					.addOnPlayerStateChangeListener(songListening_playerHandler);
 			songListening_player_songPlayer
-					.addOnPlayerProgressListener(playerHandler);
+					.addOnPlayerProgressListener(songListening_playerHandler);
 
 			Log.i("SongListening / onCreate", "network available : "
 					+ new WifiOnlyNetworkStateChecker().isNetworkAvailable());
@@ -146,25 +141,25 @@ public class SongListeningActivity extends Activity {
 	}
 
 	public void songListening_onClick_play(View view) {
-		if (buttons_areClickable) {
+		if (songListening_boolean_buttons_areClickable) {
 			play();
 		}
 	}
 
 	public void songListening_onClick_pause(View view) {
-		if (buttons_areClickable) {
+		if (songListening_boolean_buttons_areClickable) {
 			songListening_player_songPlayer.pause();
 		}
 	}
 
 	public void songListening_onClick_next(View view) {
-		if (buttons_areClickable) {
+		if (songListening_boolean_buttons_areClickable) {
 			goTo_nextSong();
 		}
 	}
 
 	public void songListening_onClick_return(View view) {
-		if (buttons_areClickable) {
+		if (songListening_boolean_buttons_areClickable) {
 			songListening_player_songPlayer.stop();
 			songListening_player_songPlayer.release();
 			Intent intent = new Intent(this, SongInputActivity.class);
@@ -173,8 +168,8 @@ public class SongListeningActivity extends Activity {
 	}
 
 	public void songListening_onClick_fav(View view) {
-		if (buttons_areClickable) {
-			if (!currentTrack_isFav) {
+		if (songListening_boolean_buttons_areClickable) {
+			if (!songListening_boolean_currentTrack_isFav) {
 				addCurrentToFav();
 			} else {
 				removeCurrentFromFav();
@@ -256,28 +251,28 @@ public class SongListeningActivity extends Activity {
 		}// met
 	}// inner class
 
-	public void songListening_nextArtist(Artist prev_artist) {
+	private void songListening_nextArtist(Artist prev_artist) {
 		DeezerRequest request_artists = new DeezerRequest("artist/"
 				+ prev_artist.getId() + "/related");
 		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
-				nextArtistRequestHandler);
+				songListening_nextArtistRequestHandler);
 		searchAsyncArtist.execute(request_artists);
 	}
 
-	void songListening_nextSongs(List<Artist> listArtists) {
+	private void songListening_nextSongs(List<Artist> listArtists) {
 		songListening_list_futureSongs = new ArrayList<Track>();
 		songListening_trackBeingListened = 0;
 		for (Artist a : listArtists) {
 			DeezerRequest request_songs = new DeezerRequest("artist/"
 					+ a.getId() + "/top");
 			AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(
-					deezerConnect, topSongRequestHandler);
+					deezerConnect, songListening_topSongRequestHandler);
 			searchAsyncArtist.execute(request_songs);
 		}
 		songListening_boolean_songSearched = true;
 	} // songListening_nextSongs
 
-	public ArrayList<Integer> parseResult(String informations) {
+	private ArrayList<Integer> parseResult(String informations) {
 		ArrayList<Integer> res = new ArrayList<Integer>();
 
 		if (informations.contains("total\":0")) {
@@ -299,7 +294,7 @@ public class SongListeningActivity extends Activity {
 		return res;
 	} // parseResult
 
-	public void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
+	private void add_nbFans(List<Artist> temp_list, ArrayList<Integer> list_fans) {
 		int i = 0;
 		for (Artist a : temp_list) {
 			a.setNbFan(list_fans.get(i));
@@ -307,11 +302,9 @@ public class SongListeningActivity extends Activity {
 		}
 	} // add_nbFans
 
-	public void tri_ArrayList(List<Integer> list) {
-		Collections.sort(list);
-	}
 
-	public boolean containsArtist(List<Artist> listT, Artist art) {
+
+	private boolean containsArtist(List<Artist> listT, Artist art) {
 		Iterator<Artist> it = listT.iterator();
 		while (it.hasNext()) {
 			Artist temp_art = it.next();
@@ -322,36 +315,36 @@ public class SongListeningActivity extends Activity {
 		return false;
 	} // containsArtist
 
-	public void goTo_nextSong() {
+	private void goTo_nextSong() {
 
 		if (songListening_boolean_songSearched) {
 
 			songListening_Track_currentTrack = songListening_list_futureSongs
 					.get(songListening_trackBeingListened);
 			++songListening_trackBeingListened;
-			--songListening_numberOfTracks_i;
+			--songListening_numberOfArtists_i;
 			songListening_player_songPlayer.stop();
 			songListening_textView_author
 					.setText(songListening_Track_currentTrack.toString());
 			play();
 
-			if (toDo) {
-				Log.i("SongListening / goTo_NextSong", "toDo : " + toDo);
+			if (songListening_boolean_toDo) {
+				Log.i("SongListening / goTo_NextSong", "toDo : " + songListening_boolean_toDo);
 				songListening_nextSongs(songListening_list_futureArtists);
-				toDo = false;
+				songListening_boolean_toDo = false;
 			}
-			if (songListening_numberOfTracks_i == 2) {
+			if (songListening_numberOfArtists_i == 2) {
 				songListening_list_futureArtists = new ArrayList<Artist>();
 				songListening_nextArtist(songListening_Track_currentTrack
 						.getArtist());
-				toDo = true;
+				songListening_boolean_toDo = true;
 			}
 
 		}
 
 	}// goTo_nextSong
 
-	public void play() {
+	private void play() {
 
 		Log.i("SongListening / play", "Song : "
 				+ songListening_Track_currentTrack);
@@ -380,10 +373,10 @@ public class SongListeningActivity extends Activity {
 		}
 	} // play
 
-	public void set_currentTrack_isFav() {
-		currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
+	private void set_currentTrack_isFav() {
+		songListening_boolean_currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
 				.contains(songListening_Track_currentTrack);
-		if (currentTrack_isFav) {
+		if (songListening_boolean_currentTrack_isFav) {
 			((ImageView) findViewById(R.id.songListening_button_fav))
 					.setImageResource(R.drawable.deezer_button_fav_yes);
 		} else {
@@ -398,7 +391,7 @@ public class SongListeningActivity extends Activity {
 
 	} // set_currentTrack_isFav
 
-	public boolean songListening_setImage() {
+	private boolean songListening_setImage() {
 		boolean rep = false;
 		try {
 			URL url = new URL(songListening_Track_currentTrack.getAlbum()
@@ -418,39 +411,39 @@ public class SongListeningActivity extends Activity {
 		return rep;
 	}
 
-	public void addCurrentToFav() {
+	private void addCurrentToFav() {
 
 		Bundle bundle = new Bundle();
 		bundle.putString("p", songListening_Track_currentTrack.toString());
 		bundle.putString("track_id",
 				String.valueOf(songListening_Track_currentTrack.getId()));
 		DeezerRequest addFav_request = new DeezerRequest("/user/"
-				+ MainActivity.userId + "/tracks", bundle, "POST");
+				+ MainActivity.main_int_userId + "/tracks", bundle, "POST");
 		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
-				addFavHandler);
+				songListening_addFavHandler);
 		asyncDeezerTask.execute(addFav_request);
 	}
 
-	public void removeCurrentFromFav() {
+	private void removeCurrentFromFav() {
 		Bundle bundle = new Bundle();
 		bundle.putString("d", songListening_Track_currentTrack.toString());
 		bundle.putString("track_id",
 				String.valueOf(songListening_Track_currentTrack.getId()));
 		DeezerRequest delFav_request = new DeezerRequest("/user/"
-				+ MainActivity.userId + "/tracks", bundle, "DELETE");
+				+ MainActivity.main_int_userId + "/tracks", bundle, "DELETE");
 		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
-				delFavHandler);
+				songListening_delFavHandler);
 		asyncDeezerTask.execute(delFav_request);
 	}
 
-	public void getWholeTrackInfo(long trackId) {
+	private void getWholeTrackInfo(long trackId) {
 		DeezerRequest requestTrackInfo = new DeezerRequest("track/" + trackId);
 		AsyncDeezerTask searchAsyncArtist = new AsyncDeezerTask(deezerConnect,
-				trackInfoRequestHandler);
+				songListening_trackInfoRequestHandler);
 		searchAsyncArtist.execute(requestTrackInfo);
 	}
 
-	private class NextArtistSearchHandler implements RequestListener {
+	private class SongListening_NextArtistSearchHandler implements RequestListener {
 		@SuppressWarnings("unchecked")
 		public void onComplete(String response, Object requestId) {
 			try {
@@ -478,23 +471,23 @@ public class SongListeningActivity extends Activity {
 				}
 
 				songListening_list_futureArtists.add(temp_artist);
-				++songListening_numberOfTracks_i;
+				++songListening_numberOfArtists_i;
 
 				Log.i("SongListening / NextSongSearchHandler",
 						"list artists : " + songListening_list_futureArtists);
 
-				if (songListening_numberOfTracks_i < 6) {
+				// recursion until 6 artists are found
+				if (songListening_numberOfArtists_i < 6) {
 					songListening_nextArtist(temp_artist);
 				} else {
 					Toast.makeText(getApplicationContext(),
 							"Buffering done, enjoy !", Toast.LENGTH_SHORT)
 							.show();
-					buttons_areClickable = true;
+					songListening_boolean_buttons_areClickable = true;
 				}
 			} catch (IllegalStateException e) {
 				Log.e("SongListening / onComplete", "IllegalStateException : "
 						+ e);
-				e.printStackTrace();
 			}// catch
 		}
 
@@ -521,7 +514,7 @@ public class SongListeningActivity extends Activity {
 		}
 	}// class
 
-	private class TopSongSearchHandler implements RequestListener {
+	private class SongListening_TopSongSearchHandler implements RequestListener {
 		public void onComplete(String response, Object requestId) {
 			try {
 
@@ -567,7 +560,7 @@ public class SongListeningActivity extends Activity {
 		}
 	}// class TopSongSearchHandler
 
-	private class AddFavHandler implements RequestListener {
+	private class SongListening_AddFavHandler implements RequestListener {
 
 		@Override
 		public void onComplete(String arg0, Object arg1) {
@@ -577,7 +570,7 @@ public class SongListeningActivity extends Activity {
 					.add(songListening_Track_currentTrack);
 			((ImageView) findViewById(R.id.songListening_button_fav))
 					.setImageResource(R.drawable.deezer_button_fav_yes);
-			currentTrack_isFav = true;
+			songListening_boolean_currentTrack_isFav = true;
 			Log.i("SongListening / addFavHandler", "Track added to fav : "
 					+ songListening_Track_currentTrack);
 		}
@@ -606,7 +599,7 @@ public class SongListeningActivity extends Activity {
 
 	}
 
-	private class DelFavHandler implements RequestListener {
+	private class SongListening_DelFavHandler implements RequestListener {
 
 		@Override
 		public void onComplete(String arg0, Object arg1) {
@@ -616,7 +609,7 @@ public class SongListeningActivity extends Activity {
 					.remove(songListening_Track_currentTrack);
 			((ImageView) findViewById(R.id.songListening_button_fav))
 					.setImageResource(R.drawable.deezer_button_fav_no);
-			currentTrack_isFav = false;
+			songListening_boolean_currentTrack_isFav = false;
 			Log.i("SongListening / addFavHandler", "Track deleted from fav : "
 					+ songListening_Track_currentTrack);
 		}
@@ -645,7 +638,7 @@ public class SongListeningActivity extends Activity {
 
 	}
 
-	private class TrackInfoRequestHandler implements RequestListener {
+	private class SongListening_TrackInfoRequestHandler implements RequestListener {
 		@Override
 		public void onComplete(String response, Object arg1) {
 			songListening_track_trackToAdd = new DeezerDataReader<Track>(

@@ -16,9 +16,7 @@
         android:layout_centerInParent="true"
         android:ems="13"
         android:hint="@string/songInput_editText_song"
-        android:inputType="text" 
-
-        />
+        android:inputType="text" />
 
     <Button
         android:id="@+id/songInput_button_search"
@@ -28,7 +26,7 @@
         android:layout_centerHorizontal="true"
         android:onClick="songInput_onClick_search"
         android:text="@string/songInput_button_search" />
-    
+
     <Button
         android:id="@+id/songInput_button_goToFavorite"
         android:layout_width="wrap_content"
@@ -36,8 +34,7 @@
         android:layout_below="@+id/songInput_button_search"
         android:layout_centerHorizontal="true"
         android:onClick="songInput_onClick_goToFavorite_v2"
-        android:text="@string/songInput_button_goToFavorite"
-        />
+        android:text="@string/songInput_button_goToFavorite" />
 
     <Button
         android:id="@+id/songInput_button_return"

@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,39 +25,33 @@ import com.deezer.sdk.SessionStore;
 
 public class SongSelectionActivity extends Activity {
 
-	ListView songSelection_listView_songList;
-	ArrayAdapter<String> songSelection_adapter_songListAdapter;
-	public static final String EXTRA_SONGSELECTION_SELECTION = "songSelection_clicked_song";
-	SharedPreferences sharedPref;
-	SharedPreferences.Editor sharedPref_editor;
-	ArrayList<String> SongSelection_list_searchResults;
+	private ListView songSelection_listView_songList;
+	private ArrayAdapter<String> songSelection_adapter_songListAdapter;
+	private ArrayList<String> songSelection_list_searchResults;
 	public final static String songSelection_string_noResults = "No results";
-	public static Track trackSelected = new Track();
+	public static Track songSelection_track_trackSelected = new Track();
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
-	private TrackInfoRequestHandler trackInfoRequestHandler = new TrackInfoRequestHandler();
+	private SongSelection_TrackInfoRequestHandler songSelection_TrackInfoRequestHandler = new SongSelection_TrackInfoRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_selection);
 
-		sharedPref = getSharedPreferences(MainActivity.name_sharedPref,
-				Context.MODE_PRIVATE);
-		sharedPref_editor = sharedPref.edit();
 		new SessionStore().restore(deezerConnect, this);
 
 		songSelection_listView_songList = (ListView) findViewById(R.id.songSelection_listView_songList);
-		SongSelection_list_searchResults = new ArrayList<String>();
+		songSelection_list_searchResults = new ArrayList<String>();
 
 		songSelection_adapter_songListAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1,
-				SongSelection_list_searchResults);
+				songSelection_list_searchResults);
 
 		songSelection_listView_songList
 				.setAdapter(songSelection_adapter_songListAdapter);
 
-		Iterator<Track> it_list_searchedSongs = SongInputActivity.listTracks
+		Iterator<Track> it_list_searchedSongs = SongInputActivity.songInput_list_listTracks
 				.iterator();
 		while (it_list_searchedSongs.hasNext()) {
 			Track temp_track = it_list_searchedSongs.next();
@@ -72,7 +64,7 @@ public class SongSelectionActivity extends Activity {
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
 
-						getTrackInfos(SongInputActivity.listTracks
+						songSelection_getTrackInfos(SongInputActivity.songInput_list_listTracks
 								.get(position));
 
 					}
@@ -83,15 +75,15 @@ public class SongSelectionActivity extends Activity {
 		finish();
 	}
 
-	public void getTrackInfos(Track track) {
+	public void songSelection_getTrackInfos(Track track) {
 		DeezerRequest getTrackInfos_request = new DeezerRequest("/track/"
 				+ track.getId());
 		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
-				trackInfoRequestHandler);
+				songSelection_TrackInfoRequestHandler);
 		asyncDeezerTask.execute(getTrackInfos_request);
 	}
 
-	public void TrackSearchComplete() {
+	public void songSelection_TrackSearchComplete() {
 
 		Intent intent = new Intent(getApplicationContext(),
 				SongListeningActivity.class);
@@ -99,15 +91,16 @@ public class SongSelectionActivity extends Activity {
 		startActivity(intent);
 
 		Log.w("SongSelection / onComplete", "received Track stream : "
-				+ trackSelected.getStream());
+				+ songSelection_track_trackSelected.getStream());
 	}
 
-	private class TrackInfoRequestHandler implements RequestListener {
+	private class SongSelection_TrackInfoRequestHandler implements
+			RequestListener {
 		@Override
 		public void onComplete(String response, Object arg1) {
-			trackSelected = new DeezerDataReader<Track>(Track.class)
-					.read(response);
-			TrackSearchComplete();
+			songSelection_track_trackSelected = new DeezerDataReader<Track>(
+					Track.class).read(response);
+			songSelection_TrackSearchComplete();
 		}
 
 		@Override

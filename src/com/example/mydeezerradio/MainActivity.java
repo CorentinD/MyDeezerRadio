@@ -28,14 +28,14 @@ import com.deezer.sdk.SessionStore;
 public class MainActivity extends Activity {
 	public final static String TAG = "com.example.mydeezerradio.Mainactivity";
 	final String defValue = "erreur recuperation données";
-	public static int userId = 0;
+	public static int main_int_userId = 0;
 	public final static String name_sharedPref = "com.example.mydeezerradio";
 	SharedPreferences sharedPref;
 	SharedPreferences.Editor sharedPref_editor;
 	public static String access_token = null;
 	public final static String sharedPref_string_userName = "string_userName";
-	public static User user_data = new User();
-	boolean isConnected;
+	public static User main_user_currentUser = new User();
+	private boolean main_boolean_isConnected;
 
 	/** Your app Deezer appId. */
 	public final static String APP_ID = "119355";
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(APP_ID);
 
 	/** DeezerRequestListener object used to handle requests. */
-	private RequestListener userRequestListenerHandler = new UserRequestHandler();
+	private RequestListener main_requestListener_userRequestListenerHandler = new Main_UserRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +57,9 @@ public class MainActivity extends Activity {
 		sharedPref_editor = sharedPref.edit();
 
 		SessionStore sessionStore = new SessionStore();
-		isConnected = sessionStore.restore(deezerConnect, this);
+		main_boolean_isConnected = sessionStore.restore(deezerConnect, this);
 
-		if (isConnected) {
+		if (main_boolean_isConnected) {
 			Toast.makeText(this, "Already logged in !", Toast.LENGTH_SHORT)
 					.show();
 		}
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-		if (isConnected) {
+		if (main_boolean_isConnected) {
 			// if the user is connected, get the user info
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
 					.setText("Connected, welcome "
@@ -78,13 +78,13 @@ public class MainActivity extends Activity {
 			((TextView) findViewById(R.id.mainV2_textView_nameUser))
 					.setText("Not connected, please log in");
 		}
-		Log.i("MainActivity / onResume", "user data : " + user_data);
+		Log.i("MainActivity / onResume", "user data : " + main_user_currentUser);
 	}
 
 	public void mainV2_onClick_connect(View view) {
 		// Attempt to connect
 		deezerConnect.authorize(MainActivity.this, PERMISSIONS,
-				new LoginDialogHandler());
+				new Main_LoginDialogHandler());
 	}
 
 	public void mainV2_onClick_disconnect(View view) {
@@ -92,9 +92,9 @@ public class MainActivity extends Activity {
 		new SessionStore().clear(this);
 
 		deezerConnect.logout(MainActivity.this);
-		isConnected = false;
+		main_boolean_isConnected = false;
 		access_token = null;
-		user_data = new User();
+		main_user_currentUser = new User();
 
 		Toast.makeText(this, "disconnected", Toast.LENGTH_SHORT).show();
 		((TextView) findViewById(R.id.mainV2_textView_nameUser))
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 	}
 
 	/** Handle DeezerConnect callbacks. */
-	private class LoginDialogHandler implements DialogListener {
+	private class Main_LoginDialogHandler implements DialogListener {
 		@Override
 		public void onComplete(final Bundle values) {
 
@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
 					Toast.LENGTH_SHORT).show();
 			Log.w("MainActivity / onComplete", access_token);
 
-			searchUser();
+			main_searchUser();
 		}// met
 
 		@Override
@@ -144,38 +144,34 @@ public class MainActivity extends Activity {
 		}// met
 	}// inner class
 
-	public void searchUser() {
+	public void main_searchUser() {
 		DeezerRequest request = new DeezerRequest("user/me");
 		AsyncDeezerTask searchAsyncUser = new AsyncDeezerTask(deezerConnect,
-				userRequestListenerHandler);
+				main_requestListener_userRequestListenerHandler);
 		searchAsyncUser.execute(request);
 
 	}
 
-	public void searchUserFinish(User user) {
+	public void main_searchUserFinish() {
 		sharedPref_editor.putString(sharedPref_string_userName,
-				user.getFirstname());
+				main_user_currentUser.getFirstname());
 		sharedPref_editor.commit();
-		user_data = user;
-		Log.i("MainActivity / searchUserFinish", "user request : " + user);
+
 		// go to the inputSong activity
 		Intent intent = new Intent(getApplicationContext(),
 				SongInputActivity.class);
 		startActivity(intent);
 	}
 
-	private class UserRequestHandler implements RequestListener {
+	private class Main_UserRequestHandler implements RequestListener {
 		@Override
 		public void onComplete(String response, Object arg1) {
 			try {
-				userId = Integer.parseInt(getId(response));
-				User user = new DeezerDataReader<User>(User.class)
+				main_user_currentUser = new DeezerDataReader<User>(User.class)
 						.read(response);
-				Log.i("MainActivity / onComplete", "user request : " + user);
-				Log.i("MainActivity / onComplete", "user ID : " + userId);
-				searchUserFinish(user);
+				main_int_userId = main_user_currentUser.getId();
+				main_searchUserFinish();
 			} catch (IllegalStateException e) {
-				handleError(e);
 				e.printStackTrace();
 			}
 		}
@@ -183,38 +179,23 @@ public class MainActivity extends Activity {
 		@Override
 		public void onDeezerError(DeezerError e, Object arg1) {
 			Log.w("userRequesthandler / onDeezerError", e);
-			handleError(e);
 		}
 
 		@Override
 		public void onIOException(IOException e, Object arg1) {
 			Log.w("userRequesthandler / onIOException", e);
-			handleError(e);
 		}
 
 		@Override
 		public void onMalformedURLException(MalformedURLException e, Object arg1) {
 			Log.w("userRequesthandler / onMalformedURLException", e);
-			handleError(e);
-
 		}
 
 		@Override
 		public void onOAuthException(OAuthException e, Object arg1) {
 			Log.w("userRequesthandler / onOAuthException", e);
-			handleError(e);
 		}
 
-	}
-
-	public void handleError(Object e) {
-		Log.e("MainActivity / Error :", e.toString());
-	}
-
-	public String getId(String data) {
-		int index_id = data.indexOf("id\":") + 5;
-		int index_name = data.indexOf(",\"name") - 1;
-		return data.substring(index_id, index_name);
 	}
 
 	@Override

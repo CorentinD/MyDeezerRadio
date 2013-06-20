@@ -24,8 +24,8 @@
         android:layout_centerHorizontal="true"
         android:onClick="mainV2_onClick_connect"
         android:text="@string/mainV2_button_connect" />
-    
-     <Button
+
+    <Button
         android:id="@+id/mainV2_button_disconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
