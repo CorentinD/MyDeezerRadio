@@ -85,6 +85,12 @@ public class SongListeningActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_song_listening);
 
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
 		Toast.makeText(this, "Buffering, please wait", Toast.LENGTH_SHORT)
 				.show();
 		songListening_Track_currentTrack = SongSelectionActivity.trackSelected;
@@ -99,6 +105,9 @@ public class SongListeningActivity extends Activity {
 
 		Log.i("SongListening / onCreate", "track preview :"
 				+ songListening_Track_currentTrack.getPreview());
+
+		songListening_setImage();
+		set_currentTrack_isFav();
 
 		try {
 			songListening_player_songPlayer = new DefaultPlayerFactory(
@@ -132,12 +141,6 @@ public class SongListeningActivity extends Activity {
 
 		songListening_list_futureSongs.add(songListening_Track_currentTrack);
 		songListening_nextArtist(songListening_Track_currentTrack.getArtist());
-
-		if (android.os.Build.VERSION.SDK_INT > 9) {
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-		}
 
 	}
 
@@ -235,7 +238,9 @@ public class SongListeningActivity extends Activity {
 		@Override
 		public void onPlayerProgress(long timePosition) {
 			((TextView) findViewById(R.id.songListening_textView_progression))
-					.setText(timePosition / 300 + " %");
+					.setText(timePosition
+							/ (songListening_Track_currentTrack.getDuration() * 10)
+							+ " %");
 			sendMessageShowPlayerProgress(timePosition);
 		}// met
 	}// inner class
@@ -353,6 +358,18 @@ public class SongListeningActivity extends Activity {
 					songListening_Track_currentTrack.getPreview());
 		}
 
+		set_currentTrack_isFav();
+
+		songListening_player_songPlayer.play();
+
+		Log.i("SongListening / play", "cover set : " + songListening_setImage());
+
+		if (!songListening_boolean_songSearched) {
+			songListening_nextSongs(songListening_list_futureArtists);
+		}
+	} // play
+
+	public void set_currentTrack_isFav() {
 		currentTrack_isFav = SongInputActivity.songInput_listTrack_listFav
 				.contains(songListening_Track_currentTrack);
 		if (currentTrack_isFav) {
@@ -363,14 +380,12 @@ public class SongListeningActivity extends Activity {
 					.setImageResource(R.drawable.deezer_button_fav_no);
 		}
 
-		songListening_player_songPlayer.play();
+		Log.i("SongListening / set_currentTrack_isFav", "list fav id : "
+				+ SongInputActivity.songInput_listTrack_listFav.get(0).getId());
+		Log.i("SongListening / set_currentTrack_isFav", "current id : "
+				+ songListening_Track_currentTrack.getId());
 
-		Log.i("SongListening / play", "cover set : " + songListening_setImage());
-
-		if (!songListening_boolean_songSearched) {
-			songListening_nextSongs(songListening_list_futureArtists);
-		}
-	} // play
+	} // set_currentTrack_isFav
 
 	public boolean songListening_setImage() {
 		boolean rep = false;

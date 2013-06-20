@@ -107,4 +107,8 @@ public class Track {
 		return (int) (this.id - ((Track) o).id);
 	}
 
+	public boolean equals(Object o) {
+		return this.compareTo(o) == 0;
+	}
+
 }// class

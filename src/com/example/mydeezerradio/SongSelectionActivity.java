@@ -1,5 +1,7 @@
 package com.example.mydeezerradio;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -14,8 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.deezer.sdk.AsyncDeezerTask;
 import com.deezer.sdk.DeezerConnect;
 import com.deezer.sdk.DeezerConnectImpl;
+import com.deezer.sdk.DeezerError;
+import com.deezer.sdk.DeezerRequest;
+import com.deezer.sdk.OAuthException;
+import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
 
 public class SongSelectionActivity extends Activity {
@@ -30,6 +37,7 @@ public class SongSelectionActivity extends Activity {
 	public static Track trackSelected = new Track();
 	private DeezerConnect deezerConnect = new DeezerConnectImpl(
 			MainActivity.APP_ID);
+	private TrackInfoRequestHandler trackInfoRequestHandler = new TrackInfoRequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,15 +72,23 @@ public class SongSelectionActivity extends Activity {
 					public void onItemClick(AdapterView<?> arg0, View v,
 							int position, long id) {
 
-						trackSelected = SongInputActivity.listTracks
-								.get(position);
-						TrackSearchComplete();
+						getTrackInfos(SongInputActivity.listTracks
+								.get(position));
+
 					}
 				});
 	}// onCreate
 
 	public void songSelection_onClick_return(View view) {
 		finish();
+	}
+
+	public void getTrackInfos(Track track) {
+		DeezerRequest getTrackInfos_request = new DeezerRequest("/track/"
+				+ track.getId());
+		AsyncDeezerTask asyncDeezerTask = new AsyncDeezerTask(deezerConnect,
+				trackInfoRequestHandler);
+		asyncDeezerTask.execute(getTrackInfos_request);
 	}
 
 	public void TrackSearchComplete() {
@@ -82,8 +98,42 @@ public class SongSelectionActivity extends Activity {
 
 		startActivity(intent);
 
-		Log.w("SongSelection / onComplete",
-				"received Track : " + trackSelected.getPreview());
+		Log.w("SongSelection / onComplete", "received Track stream : "
+				+ trackSelected.getStream());
 	}
+
+	private class TrackInfoRequestHandler implements RequestListener {
+		@Override
+		public void onComplete(String response, Object arg1) {
+			trackSelected = new DeezerDataReader<Track>(Track.class)
+					.read(response);
+			TrackSearchComplete();
+		}
+
+		@Override
+		public void onDeezerError(DeezerError arg0, Object arg1) {
+			Log.w("SongSelection / TrackInfoRequestHandler", "onDeezerError"
+					+ arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onIOException(IOException arg0, Object arg1) {
+			Log.w("SongSelection / TrackInfoRequestHandler", "IOException"
+					+ arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onMalformedURLException(MalformedURLException arg0,
+				Object arg1) {
+			Log.w("SongSelection / TrackInfoRequestHandler",
+					"onMalformedURLException" + arg0 + " / " + arg1);
+		}
+
+		@Override
+		public void onOAuthException(OAuthException arg0, Object arg1) {
+			Log.w("SongSelection / TrackInfoRequestHandler", "onOAuthException"
+					+ arg0 + " / " + arg1);
+		}
+	} // class TrackInfoRequestHandler
 
 } // SongSelectionActivity
