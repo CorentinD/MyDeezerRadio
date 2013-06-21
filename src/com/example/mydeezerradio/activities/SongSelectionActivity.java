@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.activities;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -22,6 +22,9 @@ import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
+import com.example.mydeezerradio.DeezerDataReader;
+import com.example.mydeezerradio.R;
+import com.example.mydeezerradio.Track;
 
 public class SongSelectionActivity extends Activity {
 
@@ -45,7 +48,7 @@ public class SongSelectionActivity extends Activity {
 		songSelection_list_searchResults = new ArrayList<String>();
 
 		songSelection_adapter_songListAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1,
+				R.layout.songselection_listview,
 				songSelection_list_searchResults);
 
 		songSelection_listView_songList

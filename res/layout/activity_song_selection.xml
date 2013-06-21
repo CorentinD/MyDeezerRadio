@@ -12,7 +12,8 @@
     <ListView
         android:id="@+id/songSelection_listView_songList"
         android:layout_width="match_parent"
-        android:layout_height="300dp" >
+        android:layout_height="330dp"
+        android:textColor="@android:color/darker_gray" >
     </ListView>
 
     <Button
@@ -22,6 +23,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:onClick="songSelection_onClick_return"
-        android:text="@string/songSelection_button_return" />
+        android:text="@string/songSelection_button_return"
+        android:textColor="@android:color/darker_gray" />
 
 </RelativeLayout>

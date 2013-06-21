@@ -14,7 +14,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/mainV2_button_connect"
@@ -23,7 +25,8 @@
         android:layout_above="@+id/mainV2_button_disconnect"
         android:layout_centerHorizontal="true"
         android:onClick="mainV2_onClick_connect"
-        android:text="@string/mainV2_button_connect" />
+        android:text="@string/mainV2_button_connect"
+        android:textColor="@android:color/darker_gray" />
 
     <Button
         android:id="@+id/mainV2_button_disconnect"
@@ -32,6 +35,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:onClick="mainV2_onClick_disconnect"
-        android:text="@string/mainV2_button_disconnect" />
+        android:text="@string/mainV2_button_disconnect"
+        android:textColor="@android:color/darker_gray" />
 
 </RelativeLayout>

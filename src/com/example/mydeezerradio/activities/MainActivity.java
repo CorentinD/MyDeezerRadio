@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.activities;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,6 +24,9 @@ import com.deezer.sdk.DialogListener;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
+import com.example.mydeezerradio.DeezerDataReader;
+import com.example.mydeezerradio.R;
+import com.example.mydeezerradio.User;
 
 public class MainActivity extends Activity {
 	public final static String TAG = "com.example.mydeezerradio.Mainactivity";

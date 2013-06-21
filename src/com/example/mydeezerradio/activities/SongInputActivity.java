@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.activities;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -22,6 +22,10 @@ import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
+import com.example.mydeezerradio.ListDeezerDataReader;
+import com.example.mydeezerradio.Playlist;
+import com.example.mydeezerradio.R;
+import com.example.mydeezerradio.Track;
 
 public class SongInputActivity extends Activity {
 

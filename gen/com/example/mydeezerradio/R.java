@@ -26,12 +26,17 @@ public final class R {
         public static final int deezer_background_songselection=0x7f020002;
         public static final int deezer_blank=0x7f020003;
         public static final int deezer_button_fav_no=0x7f020004;
-        public static final int deezer_button_fav_yes=0x7f020005;
-        public static final int deezer_button_next=0x7f020006;
-        public static final int deezer_button_pause=0x7f020007;
-        public static final int deezer_button_play=0x7f020008;
-        public static final int deezer_cover_default=0x7f020009;
-        public static final int ic_launcher=0x7f02000a;
+        public static final int deezer_button_fav_no_v1=0x7f020005;
+        public static final int deezer_button_fav_yes=0x7f020006;
+        public static final int deezer_button_fav_yes_v1=0x7f020007;
+        public static final int deezer_button_next=0x7f020008;
+        public static final int deezer_button_next_v1=0x7f020009;
+        public static final int deezer_button_pause=0x7f02000a;
+        public static final int deezer_button_pause_v1=0x7f02000b;
+        public static final int deezer_button_play=0x7f02000c;
+        public static final int deezer_button_play_v1=0x7f02000d;
+        public static final int deezer_cover_default=0x7f02000e;
+        public static final int ic_launcher=0x7f02000f;
     }
     public static final class id {
         public static final int action_settings=0x7f080011;
@@ -58,6 +63,7 @@ public final class R {
         public static final int activity_song_input=0x7f030001;
         public static final int activity_song_listening=0x7f030002;
         public static final int activity_song_selection=0x7f030003;
+        public static final int songselection_listview=0x7f030004;
     }
     public static final class menu {
         public static final int favorite_songs=0x7f070000;

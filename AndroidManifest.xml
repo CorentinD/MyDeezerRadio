@@ -21,7 +21,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.mydeezerradio.MainActivity"
+            android:name="com.example.mydeezerradio.activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -31,27 +31,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.SongInputActivity"
+            android:name="com.example.mydeezerradio.activities.SongInputActivity"
             android:label="@string/title_activity_song_input"
-            android:parentActivityName="com.example.mydeezerradio.MainActivity"
+            android:parentActivityName="com.example.mydeezerradio.activities.MainActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mydeezerradio.MainActivity" />
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.SongSelectionActivity"
+            android:name="com.example.mydeezerradio.activities.SongSelectionActivity"
             android:label="@string/title_activity_song_selection"
-            android:parentActivityName="com.example.mydeezerradio.SongInputActivity"
+   			android:parentActivityName="com.example.mydeezerradio.activities.SongInputActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mydeezerradio.SongInput" />
         </activity>
         <activity
-            android:name="com.example.mydeezerradio.SongListeningActivity"
+            android:name="com.example.mydeezerradio.activities.SongListeningActivity"
             android:label="@string/title_activity_song_listening"
-            android:parentActivityName="com.example.mydeezerradio.SongSelectionActivity"
+            android:parentActivityName="com.example.mydeezerradio.activities.SongSelectionActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

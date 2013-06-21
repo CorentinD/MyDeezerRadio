@@ -12,7 +12,7 @@
     <ImageView
         android:id="@+id/songListening_imageView_cover"
         android:layout_width="fill_parent"
-        android:layout_height="270dp"
+        android:layout_height="240dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
@@ -24,10 +24,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/songListening_imageView_cover"
+        android:layout_marginBottom="5sp"
+        android:layout_marginTop="5sp"
         android:layout_toLeftOf="@+id/songListening_textView_progression"
         android:ems="13"
         android:overScrollMode="ifContentScrolls"
-        android:textSize="@dimen/activity_horizontal_margin"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="20sp"
         android:textStyle="italic" />
 
     <TextView
@@ -39,14 +42,20 @@
         android:layout_below="@+id/songListening_imageView_cover"
         android:layout_toRightOf="@+id/songListening_button_next"
         android:ems="10"
-        android:text="@string/songListening_textView_progression" />
+        android:gravity="right"
+        android:text="@string/songListening_textView_progression"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="20sp" />
 
     <ImageButton
         android:id="@+id/songListening_button_play"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/songListening_textView_author"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/songListening_imageButton_play_description"
         android:onClick="songListening_onClick_play"
@@ -54,6 +63,7 @@
 
     <ImageButton
         android:id="@+id/songListening_button_pause"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/songListening_textView_author"
@@ -65,6 +75,7 @@
 
     <ImageButton
         android:id="@+id/songListening_button_next"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/songListening_textView_author"
@@ -76,10 +87,12 @@
 
     <ImageButton
         android:id="@+id/songListening_button_fav"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/songListening_button_play"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="5sp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/songListening_imageButton_fav_description"
         android:onClick="songListening_onClick_fav"
@@ -92,6 +105,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:onClick="songListening_onClick_return"
-        android:text="@string/songListening_button_return" />
+        android:text="@string/songListening_button_return"
+        android:textColor="@android:color/darker_gray" />
 
 </RelativeLayout>

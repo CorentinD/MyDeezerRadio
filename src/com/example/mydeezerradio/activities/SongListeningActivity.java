@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.activities;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +42,11 @@ import com.deezer.sdk.player.event.OnPlayerStateChangeListener;
 import com.deezer.sdk.player.event.PlayerState;
 import com.deezer.sdk.player.impl.DefaultPlayerFactory;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
+import com.example.mydeezerradio.Artist;
+import com.example.mydeezerradio.DeezerDataReader;
+import com.example.mydeezerradio.ListDeezerDataReader;
+import com.example.mydeezerradio.R;
+import com.example.mydeezerradio.Track;
 
 public class SongListeningActivity extends Activity {
 	private TextView songListening_textView_author;
