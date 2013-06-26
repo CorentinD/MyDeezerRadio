@@ -22,10 +22,10 @@ import com.deezer.sdk.DeezerRequest;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
-import com.example.mydeezerradio.ListDeezerDataReader;
-import com.example.mydeezerradio.Playlist;
 import com.example.mydeezerradio.R;
-import com.example.mydeezerradio.Track;
+import com.example.mydeezerradio.deezerclasses.ListDeezerDataReader;
+import com.example.mydeezerradio.deezerclasses.Playlist;
+import com.example.mydeezerradio.deezerclasses.Track;
 
 public class SongInputActivity extends Activity {
 

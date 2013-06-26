@@ -24,9 +24,9 @@ import com.deezer.sdk.DialogListener;
 import com.deezer.sdk.OAuthException;
 import com.deezer.sdk.RequestListener;
 import com.deezer.sdk.SessionStore;
-import com.example.mydeezerradio.DeezerDataReader;
 import com.example.mydeezerradio.R;
-import com.example.mydeezerradio.User;
+import com.example.mydeezerradio.deezerclasses.DeezerDataReader;
+import com.example.mydeezerradio.deezerclasses.User;
 
 public class MainActivity extends Activity {
 	public final static String TAG = "com.example.mydeezerradio.Mainactivity";

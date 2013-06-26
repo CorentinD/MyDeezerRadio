@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.deezerclasses;
 
 import java.util.List;
 

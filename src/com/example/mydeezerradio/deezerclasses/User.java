@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.deezerclasses;
 
 /**
  * A user in the simple Deezer API. This class will be serialized/deserialized

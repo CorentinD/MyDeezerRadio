@@ -1,4 +1,4 @@
-package com.example.mydeezerradio;
+package com.example.mydeezerradio.deezerclasses;
 
 /**
  * An interface used to declare the common behavior of data structures that use
